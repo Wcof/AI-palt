@@ -1,0 +1,22 @@
+{
+  "abilities": {
+    "list": {
+      "title": "安全生产中心"
+    },
+    "market": {
+      "desc": "聚焦隐患排查、三违管控、作业票合规、事故复盘与应急处置，汇聚 AI 安全算法、安全生产知识库、AI 智能体与 AI 技能，支持快速接入与工程化落地。"
+    }
+  },
+  "knowledge": {
+    "industry": {
+      "hazardous-chemical": "危化品",
+      "trade": "工贸",
+      "construction": "建筑",
+      "mining": "矿山",
+      "other": "其他"
+    },
+    "download": "下载",
+    "empty": "暂无数据",
+    "search_placeholder": "搜索知识库..."
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "abilities": {
+    "list": {
+      "title": "Ability Market"
+    },
+    "market": {
+      "desc": "Aggregating AI capabilities such as algorithms, models, and knowledge bases, supporting one-click claim and rapid integration."
+    }
+  },
+  "knowledge": {
+    "industry": {
+      "hazardous-chemical": "Hazardous Chemical",
+      "trade": "Trade",
+      "construction": "Construction",
+      "mining": "Mining",
+      "other": "Other"
+    },
+    "download": "Download",
+    "empty": "No Data",
+    "search_placeholder": "Search knowledge base..."
+  }
+}

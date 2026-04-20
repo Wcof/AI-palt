@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(900px 520px at 16% 10%, rgba(0, 180, 255, 0.22), transparent 62%),
+    radial-gradient(820px 520px at 82% 18%, rgba(141, 76, 255, 0.16), transparent 60%),
+    radial-gradient(760px 520px at 60% 90%, rgba(0, 180, 255, 0.12), transparent 62%),
+    linear-gradient(180deg, #f6fbff 0%, #ffffff 45%, #f1f7ff 100%);
+  color: #0b1220;
+}
+
+* {
+  scroll-behavior: smooth;
+}
+
+.tech-grid {
+  background-image: linear-gradient(rgba(0, 180, 255, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 180, 255, 0.12) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: radial-gradient(closest-side at 50% 12%, rgba(0, 0, 0, 1), transparent 78%);
+}
+
+@keyframes ctaPulse {
+  0% {
+    box-shadow: 0 0 0 rgba(0, 180, 255, 0), 0 0 0 rgba(141, 76, 255, 0);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 0 18px rgba(0, 180, 255, 0.55), 0 0 36px rgba(141, 76, 255, 0.22);
+    transform: translateY(-1px);
+  }
+  100% {
+    box-shadow: 0 0 0 rgba(0, 180, 255, 0), 0 0 0 rgba(141, 76, 255, 0);
+    transform: translateY(0);
+  }
+}
+
+@keyframes iconWiggle {
+  0% {
+    transform: rotate(0deg) scale(1);
+  }
+  35% {
+    transform: rotate(8deg) scale(1.06);
+  }
+  70% {
+    transform: rotate(-6deg) scale(1.04);
+  }
+  100% {
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes pageEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .text-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .text-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cta-pulse {
+    animation: ctaPulse 1.6s ease-in-out infinite;
+  }
+
+  .icon-wiggle {
+    animation: iconWiggle 700ms ease-in-out both;
+  }
+
+  .page-enter {
+    animation: pageEnter 300ms ease-out both;
+  }
+
+  a,
+  button {
+    --glow-shadow: 0 0 0 rgba(0, 180, 255, 0);
+    box-shadow: var(--glow-shadow), var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000),
+      var(--tw-shadow, 0 0 #0000);
+  }
+
+  a:hover,
+  button:hover,
+  a:focus-visible,
+  button:focus-visible {
+    --glow-shadow: 0 0 12px rgba(0, 180, 255, 0.6);
+  }
+
+  a:focus-visible,
+  button:focus-visible {
+    outline: 2px solid rgba(0, 180, 255, 0.55);
+    outline-offset: 2px;
+  }
+}
