@@ -35,7 +35,7 @@ vue-tsc -b              # Check TypeScript types
   - `aiApp/` - Chat interface components (ChatInterface, ConversationSidebar, WelcomeScreen)
   - `abilities/` - Ability cards and browser (AbilityCard, AbilityBrowser, AbilityFloors)
   - `workbench/` - Workbench-specific components
-  - `layout/` - AppShell with TopNav and footer
+  - `layout/` - AppShell without topbar + left side navigation
   - `auth/` - LoginModal, UserDropdown
   - `search/` - GlobalSearch component
   - `experience/` - Demo panels (ChatPanel, DocsPanel, ExperiencePreviewPanel)
@@ -48,7 +48,7 @@ vue-tsc -b              # Check TypeScript types
   - `chat.ts`, `knowledge.ts`, `subscriptions.ts` - Domain-specific state
 
 - **Routing** (`src/router/index.ts`): Hash-based routing with nested layouts
-  - Root layout: `AppShell` (TopNav + main content + footer)
+  - Root layout: `AppShell` (no topbar + main content + left navigation)
   - Main routes: abilities, search, ability/:id, ai-app, experience, workbench/*
   - Workbench nested routes: subscriptions, apps, keys, stats
 

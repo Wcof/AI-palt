@@ -40,10 +40,10 @@ onUnmounted(() => clearInterval(timer))
     </div>
 
     <div class="relative flex h-full w-full transition-transform duration-500 ease-out" :class="reducedMotion && 'duration-0'" :style="{ transform: `translateX(-${index * 100}%)` }">
-      <div v-for="s in slides" :key="s.id" class="flex h-full w-full shrink-0 items-center justify-center px-8 sm:px-16">
-        <div class="max-w-[680px] text-center">
-          <h2 class="text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">{{ s.title }}</h2>
-          <p class="mt-4 text-sm leading-6 text-slate-700 sm:text-base">{{ s.subtitle }}</p>
+      <div v-for="s in slides" :key="s.id" class="flex h-full w-full shrink-0 basis-full items-center justify-center px-8 sm:px-16">
+        <div class="flex h-[280px] w-full max-w-[760px] flex-col items-center justify-center text-center">
+          <h2 class="min-h-[56px] text-4xl font-semibold tracking-tight text-slate-900 sm:text-5xl">{{ s.title }}</h2>
+          <p class="mt-4 min-h-[56px] max-w-[680px] text-sm leading-6 text-slate-700 sm:text-base">{{ s.subtitle }}</p>
           <router-link :to="s.ctaTo" class="mt-6 inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#0098FF] to-[#006CFF] px-5 py-2.5 text-sm font-semibold text-white shadow-lg ring-1 ring-[#00B4FF]/55 transition hover:brightness-105 cta-pulse">
             立即探索
           </router-link>

@@ -22,7 +22,7 @@ async function handleSubmit() {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-[300] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+  <div v-if="isOpen" class="fixed inset-0 z-[300] flex items-center justify-center bg-blue-950/25 backdrop-blur-sm p-4">
     <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl ring-1 ring-black/5">
       <button @click="emit('close')" class="absolute right-4 top-4 rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors">
         <X class="h-5 w-5" />

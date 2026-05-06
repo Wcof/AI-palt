@@ -24,7 +24,7 @@ watch(() => props.open, (v) => {
 </script>
 
 <template>
-  <div v-if="open" class="fixed inset-0 z-[320] flex items-center justify-center overscroll-contain bg-black/40 backdrop-blur-sm p-4" role="dialog" aria-modal="true" @mousedown.self="emit('close')">
+  <div v-if="open" class="fixed inset-0 z-[320] flex items-center justify-center overscroll-contain bg-blue-950/25 backdrop-blur-sm p-4" role="dialog" aria-modal="true" @mousedown.self="emit('close')">
     <div class="w-full max-w-[860px] overflow-hidden rounded-2xl border border-sky-200/60 bg-white/90 shadow-2xl">
       <div class="flex items-start justify-between gap-3 border-b border-sky-200/60 px-5 py-4">
         <div class="min-w-0">

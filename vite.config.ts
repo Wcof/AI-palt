@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
-  base: '/ai-platform-frontend/',
+  base: '/AI-palt/',
   plugins: [vue()],
   resolve: {
     alias: {

@@ -6,10 +6,17 @@ export interface User {
   username: string
   avatar: string
   email: string
+  role?: string
 }
 
 export const useUserStore = defineStore('user', () => {
-  const user = ref<User | null>(null)
+  const user = ref<User | null>({
+    id: 'demo-user',
+    username: '周志远',
+    avatar: '',
+    email: 'zhouzhiyuan@example.com',
+    role: '安全总监',
+  })
   const isAuthenticated = computed(() => !!user.value)
 
   function login(username: string) {
@@ -18,6 +25,7 @@ export const useUserStore = defineStore('user', () => {
       username,
       avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`,
       email: `${username}@example.com`,
+      role: '安全管理人员',
     }
   }
 

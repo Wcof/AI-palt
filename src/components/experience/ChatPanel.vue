@@ -162,7 +162,7 @@ function clearChat() {
       <div v-if="imageOnly" class="space-y-3">
         <div v-if="selectedImage" class="relative rounded-xl border border-sky-200/70 bg-white/80 p-2">
           <img :src="selectedImage" alt="预览" class="max-h-32 rounded-lg" />
-          <button @click="selectedImage = null" class="absolute right-2 top-2 rounded-lg bg-slate-900/70 px-2 py-1 text-xs text-white hover:bg-slate-900">移除</button>
+          <button @click="selectedImage = null" class="absolute right-2 top-2 rounded-lg bg-blue-600/90 px-2 py-1 text-xs text-white hover:bg-blue-700">移除</button>
         </div>
         <div class="flex items-center gap-2">
           <button type="button" @click="triggerImageUpload" class="flex-1 rounded-xl border border-sky-200/70 bg-white/80 px-4 py-2 text-sm text-slate-700 transition hover:bg-white">

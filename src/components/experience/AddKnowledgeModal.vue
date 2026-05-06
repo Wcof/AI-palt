@@ -33,11 +33,11 @@ const filtered = computed(() => {
 </script>
 
 <template>
-  <div v-if="open" class="fixed inset-0 z-[320] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" role="dialog" aria-modal="true" @mousedown.self="emit('close')">
+  <div v-if="open" class="fixed inset-0 z-[320] flex items-center justify-center bg-blue-950/25 backdrop-blur-sm p-4" role="dialog" aria-modal="true" @mousedown.self="emit('close')">
     <div class="w-full max-w-[880px] rounded-2xl border border-sky-200/60 bg-white/90 p-5 shadow-2xl">
       <div class="flex items-start justify-between gap-3">
         <div>
-          <div class="text-base font-semibold text-slate-900">{{ title ?? '添加知识库' }}</div>
+          <div class="text-base font-semibold text-slate-900">{{ title ?? '新建知识库' }}</div>
           <div class="mt-1 text-xs text-slate-600">{{ hint ?? '支持检索、单选与双击预览' }}</div>
         </div>
         <button type="button" @click="emit('close')" class="rounded-xl bg-white/70 p-2 text-slate-700 ring-1 ring-sky-200/70 transition hover:bg-white"><X class="h-4 w-4" /></button>

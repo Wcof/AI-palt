@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { LogOut, Cog } from 'lucide-vue-next'
+import { LogOut, Cog, Database, Bot, Code } from 'lucide-vue-next'
 
 const userStore = useUserStore()
 const isOpen = ref(false)
@@ -26,6 +26,15 @@ onUnmounted(() => document.removeEventListener('mousedown', handleClickOutside))
         <p class="text-xs text-slate-500 truncate">{{ userStore.user.email }}</p>
       </div>
       <div class="py-1">
+        <router-link to="/knowledge" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" @click="isOpen = false">
+          <Database class="h-4 w-4" /> 知识库管理
+        </router-link>
+        <router-link to="/agents" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" @click="isOpen = false">
+          <Bot class="h-4 w-4" /> 智能体管理
+        </router-link>
+        <router-link to="/mcp" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" @click="isOpen = false">
+          <Code class="h-4 w-4" /> AI 技能管理
+        </router-link>
         <router-link to="/system" class="flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50" @click="isOpen = false">
           <Cog class="h-4 w-4" /> 系统设置
         </router-link>

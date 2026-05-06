@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "module": "esnext",
+    "target": "es2020",
+    "moduleResolution": "bundler",
+    "allowJs": false,
+    "noResolve": true,
+    "strict": false,
+    "types": []
+  },
+  "files": [
+    "src/stores/aiApp.ts",
+    "src/router/index.ts",
+    "src/stores/skillCenter.ts",
+    "src/stores/system.ts"
+  ]
+}

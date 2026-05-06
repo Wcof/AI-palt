@@ -1,13 +1,14 @@
 import { inject } from 'vue';
+import { useUserStore } from '@/stores/user';
 
 type OpenAiLoginDialog = () => void;
 
 export function useAiLoginGuard() {
+  const userStore = useUserStore();
   const openAiLoginDialog = inject<OpenAiLoginDialog>('openAiLoginDialog');
 
   const ensureLogin = () => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    if (userStore.isAuthenticated) {
       return true;
     }
     openAiLoginDialog?.();

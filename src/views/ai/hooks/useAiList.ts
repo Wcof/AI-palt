@@ -1,5 +1,7 @@
 import { ref } from 'vue';
-import { ABILITIES } from '@/data/abilities';
+import { knowledgeApi } from '@/mocks/ai/knowledge';
+import { agentApi } from '@/mocks/ai/agent';
+import { mcpApi } from '@/mocks/ai/mcp';
 
 interface ListItem {
   id: string;
@@ -10,6 +12,10 @@ interface ListItem {
   name: string;
   status: string;
   updateTime: string;
+  labels?: string[];
+  iconPath?: string;
+  agentName?: string;
+  description?: string;
 }
 
 interface PageInfo {
@@ -17,6 +23,11 @@ interface PageInfo {
   pageSize: number;
   total: number;
   totalPage: number;
+}
+
+interface Label {
+  id: string;
+  name: string;
 }
 
 export const useAiList = (menuType: string) => {
@@ -29,66 +40,108 @@ export const useAiList = (menuType: string) => {
   });
   const checkType = ref<'more' | 'paged'>('more');
   const queryParams = ref<Record<string, any>>({});
+  const loading = ref(false);
+  const labelList = ref<Label[]>([]);
 
   const getList = async (type: 'more' | 'paged' = checkType.value) => {
     checkType.value = type;
+    loading.value = true;
 
-    const filtered = ABILITIES.filter(a => {
-      if (menuType === 'knowladge') return a.domain === 'NLP';
-      if (menuType === 'agent') return a.domain === 'LLM';
-      if (menuType === 'mcp') return a.domain === 'MCP';
-      return true;
-    });
+    try {
+      let response;
+      const params = {
+        page: pageInfo.value.page,
+        pageSize: pageInfo.value.pageSize,
+        keyword: queryParams.value.keyword,
+        labels: queryParams.value.labels,
+      };
 
-    const keyword = queryParams.value.keyword?.toLowerCase() || '';
-    const filteredByKeyword = keyword
-      ? filtered.filter(a => a.name.toLowerCase().includes(keyword) || a.summary.toLowerCase().includes(keyword))
-      : filtered;
-
-    const start = (pageInfo.value.page - 1) * pageInfo.value.pageSize;
-    const end = start + pageInfo.value.pageSize;
-    const records = filteredByKeyword.slice(start, end);
-
-    pageInfo.value.total = filteredByKeyword.length;
-    pageInfo.value.totalPage = Math.ceil(filteredByKeyword.length / pageInfo.value.pageSize);
-
-    if (type === 'more') {
-      if (pageInfo.value.page === 1) {
-        lists.value = records.map(a => ({
-          id: a.id,
-          createBy: 'system',
-          createBy_dictText: '系统',
-          createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-          descr: a.summary,
-          name: a.name,
-          status: '1',
-          updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        }));
-      } else {
-        const newRecords = records.map(a => ({
-          id: a.id,
-          createBy: 'system',
-          createBy_dictText: '系统',
-          createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-          descr: a.summary,
-          name: a.name,
-          status: '1',
-          updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        }));
-        lists.value = [...lists.value, ...newRecords];
+      switch (menuType) {
+        case 'knowladge':
+        case 'knowledge':
+          response = await knowledgeApi.getList(params);
+          break;
+        case 'agent':
+          response = await agentApi.getList(params);
+          break;
+        case 'mcp':
+          response = await mcpApi.getList(params);
+          break;
+        default:
+          response = await knowledgeApi.getList(params);
       }
-    } else {
-      lists.value = records.map(a => ({
-        id: a.id,
-        createBy: 'system',
-        createBy_dictText: '系统',
-        createTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-        descr: a.summary,
-        name: a.name,
-        status: '1',
-        updateTime: new Date().toISOString().slice(0, 19).replace('T', ' '),
-      }));
+
+      if (response.code === 200) {
+        const { records, total, totalPage } = response.data;
+        pageInfo.value.total = total;
+        pageInfo.value.totalPage = totalPage;
+
+        const formattedRecords = records.map((item: any) => ({
+          id: item.id,
+          createBy: item.createBy || 'system',
+          createBy_dictText: item.createBy_dictText || '系统',
+          createTime: item.createTime || new Date().toISOString().slice(0, 19).replace('T', ' '),
+          descr: item.descr || item.description || '',
+          name: item.name || item.agentName || '',
+          status: item.status || '1',
+          updateTime: item.updatedAt || new Date().toISOString().slice(0, 19).replace('T', ' '),
+          labels: item.labels,
+          iconPath: item.iconPath,
+          agentName: item.agentName,
+          description: item.description,
+        }));
+
+        if (type === 'more') {
+          if (pageInfo.value.page === 1) {
+            lists.value = formattedRecords;
+          } else {
+            lists.value = [...lists.value, ...formattedRecords];
+          }
+        } else {
+          lists.value = formattedRecords;
+        }
+      }
+    } catch (error) {
+      console.error('获取列表失败:', error);
+    } finally {
+      loading.value = false;
     }
+  };
+
+  const getLabelList = async () => {
+    // 模拟获取标签列表
+    const labelsMap = {
+      knowladge: [
+        { id: 'security', name: '安全' },
+        { id: 'enterprise', name: '企业' },
+        { id: 'regulation', name: '规范' },
+        { id: 'production', name: '生产' },
+        { id: 'management', name: '管理' },
+      ],
+      knowledge: [
+        { id: 'security', name: '安全' },
+        { id: 'enterprise', name: '企业' },
+        { id: 'regulation', name: '规范' },
+        { id: 'production', name: '生产' },
+        { id: 'management', name: '管理' },
+      ],
+      agent: [
+        { id: 'security', name: '安全' },
+        { id: 'assistant', name: '助手' },
+        { id: 'consultation', name: '咨询' },
+        { id: 'production', name: '生产' },
+        { id: 'technical', name: '技术' },
+      ],
+      mcp: [
+        { id: 'equipment', name: '设备' },
+        { id: 'monitoring', name: '监控' },
+        { id: 'production', name: '生产' },
+        { id: 'data', name: '数据' },
+        { id: 'security', name: '安全' },
+      ],
+    };
+
+    labelList.value = labelsMap[menuType as keyof typeof labelsMap] || [];
   };
 
   const handleReset = (resetParams: Record<string, any> = {}) => {
@@ -108,7 +161,10 @@ export const useAiList = (menuType: string) => {
     pageInfo,
     checkType,
     queryParams,
+    loading,
+    labelList,
     getList,
+    getLabelList,
     handleReset,
     handleSearch,
   };

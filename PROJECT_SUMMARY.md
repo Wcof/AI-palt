@@ -71,7 +71,7 @@ ai-platform-frontend-vue2/
 │   │   ├── layout/               # 布局组件
 │   │   │   └── AppShell.vue
 │   │   ├── nav/                  # 导航组件
-│   │   │   └── TopNav.vue
+│   │   │   └── PlatformSideNav.vue
 │   │   ├── prd/                  # PRD 相关组件
 │   │   │   └── PrdOverlay.vue
 │   │   ├── search/               # 搜索组件
@@ -237,13 +237,13 @@ ai-platform-frontend-vue2/
 #### AppShell.vue
 - **作用**：应用主布局容器
 - **包含**：
-  - TopNav - 顶部导航栏
+  - PlatformSideNav - 左侧平台导航
   - RouterView - 页面内容区域
   - Footer - 页脚
   - PrdOverlay - PRD 文档覆盖层
 
-#### TopNav.vue
-- **作用**：顶部导航栏
+#### PlatformSideNav.vue
+- **作用**：左侧导航栏
 - **导航项**：
   - AI 智能助手
   - 能力平台
@@ -289,7 +289,7 @@ ai-platform-frontend-vue2/
 
 #### 按功能分类
 - **布局组件**：AppShell
-- **导航组件**：TopNav
+- **导航组件**：PlatformSideNav
 - **能力相关**：AbilityBrowser, AbilityCard, AbilityFloors
 - **AI 应用**：ChatInterface, ConversationSidebar, WelcomeScreen
 - **认证相关**：LoginModal, UserDropdown

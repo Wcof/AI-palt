@@ -1,0 +1,34 @@
+# Changelog
+
+## v0.4.0-traceability-loop
+
+- 新增“页面内 PRD 查看入口”规范：支持右下角 `PRD` 按钮、遮罩面板、路由映射读取当前页面 PRD。
+- 新增模板：`references/templates/prd-viewer-integration-template.md`，用于前端原型快速接入 PRD 查看器。
+- 新增 `scripts/install_skill.py` 交互式安装向导：引导选择当前项目/全局安装，并确认 PRD 存储目录名。
+- 新增重复安装治理：检测已安装并支持 `skip/reinstall/reinstall-reset` 三种策略。
+- 新增“重置并迁移”能力：重置前自动备份旧 PRD 目录，重置后自动迁移核心文档并输出迁移报告。
+- 修复自定义 PRD 目录场景：`AGENTS.md` 模板支持动态 `{PRD_ROOT}` 并输出正确命令。
+- 修复一致性脚本目录透传：`scripts/check_consistency.sh` 支持 `PRD_ROOT` 环境变量并使用绝对脚本路径。
+- 修复非 git 目录执行 `diff-sync --staged` 的噪音问题，改为静默降级为空变更。
+- 优化安装拷贝过滤规则，避免把 `.pytest_cache/.mypy_cache/.ruff_cache` 等开发缓存带入目标项目。
+- 新增 traceability 轻量元数据模型：页面 PRD frontmatter 包含 `page_id/route/code_paths/feature_ids/change_ids/last_synced_at`。
+- 升级路由清单、功能清单、页面变更记录模板，增加可机器解析字段。
+- `scripts/prdctl.py` 新增 `sync`、`diff-sync`，审计升级为 `audit --level basic|strict`，并支持 `--fail-on-high`。
+- 新增 traceability 索引输出：`docs/product/.index/traceability.json`。
+- 新增一致性检查脚本：`scripts/check_consistency.sh`。
+- 新增 pre-commit 本地检查配置（warn 模式）和 GitHub Actions 一致性流程。
+- 测试从单一 `--help` 扩展到 frontmatter、sync、strict audit 等核心能力。
+
+## v0.3.0-engineered
+
+- 将 create-prd 从单一 14 章 PRD 生成器升级为工程化 PRD Skill。
+- 新增五种模式：system-prd、greenfield-page-sync、existing-code-init、axure-html-import、consistency-audit。
+- 新增 `scripts/prdctl.py` 统一 CLI。
+- 新增 Codex 仓库级安装路径 `.agents/skills/create-prd/`。
+- 新增 `docs/product` 业务项目 PRD 目录初始化能力。
+- 新增代码路由扫描、Axure HTML 页面扫描、页面 PRD 草稿生成、轻量审计能力。
+- 新增页面 PRD、变更记录、功能清单、路由清单、AGENTS.md 模板。
+
+## v0.2.0
+
+- 原始 create-prd 14 章系统级 PRD 生成能力。

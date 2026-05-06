@@ -9,6 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
+    "ant-design-vue": "^4.2.6",
     "clsx": "^2.1.1",
     "highlight.js": "^11.11.1",
     "lucide-vue-next": "^0.469.0",

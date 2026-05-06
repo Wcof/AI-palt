@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "skipLibCheck": true,
+    "module": "esnext",
+    "target": "es2020",
+    "moduleResolution": "bundler",
+    "allowJs": false,
+    "noResolve": true,
+    "strict": false,
+    "types": []
+  },
+  "files": [
+    "tmp_script_checks/systemSettings.vue.ts",
+    "tmp_script_checks/ChatInterface.vue.ts",
+    "tmp_script_checks/index.vue.ts",
+    "tmp_script_checks/index.vue.ts",
+    "tmp_script_checks/index.vue.ts",
+    "tmp_script_checks/detail.vue.ts",
+    "tmp_script_checks/skillDetail.vue.ts",
+    "tmp_script_checks/Nl2sqlChartPanel.vue.ts"
+  ]
+}
