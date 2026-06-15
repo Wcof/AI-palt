@@ -1145,7 +1145,7 @@ export const useNewAIStore = defineStore('newAI', () => {
       ? `${model.protocol} 协议连通性测试成功`
       : '测试失败：请检查协议、URL、Token 或模型名称'
     model.latencyMs = success ? 1020 : 0
-    logAudit('模型配置', `测试: ${model.name}`, model.lastTestMessage, success)
+    logAudit('模型配置', `测试: ${model.name}`, '', model.lastTestMessage ?? '', success)
     return {
       success,
       message: model.lastTestMessage,
@@ -1700,14 +1700,14 @@ export const useNewAIStore = defineStore('newAI', () => {
     return true
   }
 
-  function logAudit(agent: string, requestParams: string, responseData: string, success: boolean = true) {
+  function logAudit(module: string, action: string, before: string = '', after: string = '', success: boolean = true) {
     auditLogs.value.unshift({
       id: uid('audit'),
       user: '产品演示账号',
-      agent,
+      agent: module,
       ip: '10.20.3.45',
-      requestParams,
-      responseData,
+      requestParams: action,
+      responseData: after,
       success,
       time: Date.now(),
     })
