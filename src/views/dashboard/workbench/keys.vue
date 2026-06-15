@@ -117,8 +117,9 @@ function handleCreate() {
       </div>
     </div>
 
-    <div v-if="createOpen" class="fixed inset-0 z-[320] flex items-center justify-center bg-blue-950/25 p-4 backdrop-blur-sm" @mousedown.self="createOpen = false">
-      <div class="w-full max-w-[720px] rounded-2xl border border-sky-200/60 bg-white/95 p-5 shadow-2xl">
+    <Teleport to="body">
+    <div v-if="createOpen" class="fixed inset-0 z-[320] h-[100dvh] min-h-[100dvh] overflow-y-auto bg-blue-950/25 p-4 backdrop-blur-sm" @mousedown.self="createOpen = false">
+      <div class="mx-auto w-full max-w-[720px] rounded-2xl border border-sky-200/60 bg-white/95 p-5 shadow-2xl">
         <div class="flex items-start justify-between gap-3"><div><div class="text-base font-semibold text-slate-900">创建 API 密钥</div><div class="mt-1 text-xs text-slate-600">密钥不再从单个技能详情页获取，统一在这里创建并选择授权范围。</div></div><button @click="createOpen = false" class="rounded-xl bg-white/70 p-2 text-slate-700 ring-1 ring-sky-200/70"><X class="h-4 w-4" /></button></div>
         <div class="mt-4 space-y-4">
           <div class="grid gap-3 md:grid-cols-2"><label class="text-xs font-semibold text-slate-700">密钥名称<input v-model="newName" placeholder="例如：生产环境密钥" class="mt-1 w-full rounded-xl border border-sky-200/70 bg-white/80 px-3 py-2 text-sm font-normal text-slate-900 outline-none" /></label><label class="text-xs font-semibold text-slate-700">所属项目<select v-model="newAppId" class="mt-1 w-full rounded-xl border border-sky-200/70 bg-white/80 px-3 py-2 text-sm font-normal text-slate-900 outline-none"><option value="">不关联</option><option v-for="app in appsStore.apps" :key="app.id" :value="app.id">{{ app.name }}</option></select></label></div>
@@ -130,5 +131,6 @@ function handleCreate() {
         <div class="mt-5 flex justify-end gap-2"><button @click="createOpen = false" class="rounded-xl bg-white/70 px-4 py-2 text-sm font-semibold text-slate-900 ring-1 ring-sky-200/70">取消</button><button @click="handleCreate" :disabled="!newName.trim() || (!newKnowledgeBase.length && !newAiSkill.length && !newAiAgent.length)" class="rounded-xl bg-gradient-to-r from-[#0098FF] to-[#006CFF] px-4 py-2 text-sm font-semibold text-white ring-1 ring-[#00B4FF]/55 disabled:opacity-50">创建</button></div>
       </div>
     </div>
+    </Teleport>
   </div>
 </template>

@@ -29,8 +29,9 @@ function onSubmit() {
 </script>
 
 <template>
-  <div class="fixed inset-0 z-[350] flex items-center justify-center bg-blue-950/30 p-4 backdrop-blur-sm" @mousedown.self="emit('close')">
-    <div class="w-full max-w-xl rounded-2xl border border-sky-200/70 bg-white p-6 shadow-2xl">
+  <Teleport to="body">
+  <div class="fixed inset-0 z-[350] h-[100dvh] min-h-[100dvh] overflow-y-auto bg-blue-950/30 p-4 backdrop-blur-sm" @mousedown.self="emit('close')">
+    <div class="mx-auto w-full max-w-xl rounded-2xl border border-sky-200/70 bg-white p-6 shadow-2xl">
       <div class="text-base font-semibold text-slate-900">{{ title }}</div>
       <div class="mt-4 space-y-4">
         <label class="block">
@@ -55,4 +56,5 @@ function onSubmit() {
       </div>
     </div>
   </div>
+  </Teleport>
 </template>

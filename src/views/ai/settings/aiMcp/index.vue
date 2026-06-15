@@ -414,8 +414,9 @@ function testResult(item: McpItem | null) {
       <SkillList />
     </section>
 
-    <div v-if="modalOpen" class="fixed inset-0 z-[120] flex items-center justify-center bg-slate-950/35 p-4 backdrop-blur-sm">
-      <div class="modal-card">
+    <Teleport to="body">
+    <div v-if="modalOpen" class="fixed inset-0 z-[120] h-[100dvh] min-h-[100dvh] overflow-y-auto bg-slate-950/35 p-4 backdrop-blur-sm">
+      <div class="modal-card mx-auto">
         <div class="modal-head">
           <div>
             <div class="modal-title">{{ modalMode === 'create' ? '新增 MCP' : modalMode === 'edit' ? '编辑 MCP' : '查看 MCP' }}</div>
@@ -513,6 +514,7 @@ function testResult(item: McpItem | null) {
         </div>
       </div>
     </div>
+    </Teleport>
   </div>
 </template>
 

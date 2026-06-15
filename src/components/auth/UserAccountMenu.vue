@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { LogIn, LogOut, Settings2, ShieldCheck, UserRound } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
-import { useSystemStore } from '@/stores/system'
 import LoginModal from '@/components/auth/LoginModal.vue'
 
 const props = defineProps<{ compact?: boolean }>()
 
+const router = useRouter()
 const userStore = useUserStore()
-const systemStore = useSystemStore()
 const open = ref(false)
 const loginOpen = ref(false)
 const menuRef = ref<HTMLDivElement | null>(null)
@@ -41,7 +41,7 @@ function toggleMenu() {
 }
 
 function openSettings() {
-  systemStore.openSettings()
+  router.push('/newAI/system')
   open.value = false
 }
 

@@ -4,6 +4,7 @@ import { message } from 'ant-design-vue'
 import { DatabaseOutlined, DeploymentUnitOutlined, EllipsisOutlined, PlusOutlined, ReloadOutlined } from '@ant-design/icons-vue'
 import AiKnowledgeBaseModal from './components/AiKnowledgeBaseModal.vue'
 import KnowledgeDocumentManagerModal, { type KnowledgeBaseLite } from './components/KnowledgeDocumentManagerModal.vue'
+import { useNewAIStore } from '@/stores/newAI'
 
 defineOptions({ name: 'AiKnowledgeBaseList' })
 
@@ -26,6 +27,17 @@ const editingKnowledge = ref<KnowledgeItem | null>(null)
 const openMenuId = ref<string>('')
 const docManagerVisible = ref(false)
 const activeKnowledgeForDocs = ref<KnowledgeBaseLite | null>(null)
+const tagModalOpen = ref(false)
+const editingTagId = ref('')
+const store = useNewAIStore()
+const tagForm = ref({
+  name: '',
+  code: '',
+  valueType: 'enum' as 'enum' | 'text',
+  required: true,
+  optionsText: '',
+  description: '',
+})
 
 const knowledgeBases = ref<KnowledgeItem[]>([
   {
@@ -136,6 +148,67 @@ function manageDocuments(item: KnowledgeItem) {
 function searchReset() {
   keyword.value = ''
 }
+
+function resetTagForm() {
+  editingTagId.value = ''
+  tagForm.value = {
+    name: '',
+    code: '',
+    valueType: 'enum',
+    required: true,
+    optionsText: '',
+    description: '',
+  }
+}
+
+function openCreateTag() {
+  resetTagForm()
+  tagModalOpen.value = true
+}
+
+function openEditTag(tagId: string) {
+  const tag = store.metadataTags.find(item => item.id === tagId)
+  if (!tag) return
+  editingTagId.value = tag.id
+  tagForm.value = {
+    name: tag.name,
+    code: tag.code,
+    valueType: tag.valueType,
+    required: tag.required,
+    optionsText: tag.options.join('、'),
+    description: tag.description,
+  }
+  tagModalOpen.value = true
+}
+
+function saveTag() {
+  if (!tagForm.value.name.trim() || !tagForm.value.code.trim()) {
+    message.warning('请先填写标签名称和编码')
+    return
+  }
+  store.upsertMetadataTag({
+    id: editingTagId.value || undefined,
+    name: tagForm.value.name.trim(),
+    code: tagForm.value.code.trim(),
+    valueType: tagForm.value.valueType,
+    required: tagForm.value.required,
+    options: tagForm.value.valueType === 'enum'
+      ? tagForm.value.optionsText.split(/[、,，]/).map(item => item.trim()).filter(Boolean)
+      : [],
+    description: tagForm.value.description.trim(),
+  })
+  message.success('标签已保存')
+  tagModalOpen.value = false
+  resetTagForm()
+}
+
+function removeTag(tagId: string) {
+  const tag = store.metadataTags.find(item => item.id === tagId)
+  if (!tag) return
+  if (!window.confirm(`确认删除标签「${tag.name}」吗？`)) return
+  store.removeMetadataTag(tagId)
+  message.success('标签已删除')
+}
 </script>
 
 <template>
@@ -159,7 +232,10 @@ function searchReset() {
       <div class="search-box">
         <input v-model="keyword" placeholder="搜索知识库名称 / 描述 / 标签" />
       </div>
-      <span class="toolbar-count">共 {{ filteredList.length }} 个知识库</span>
+      <div class="flex items-center gap-2">
+        <button type="button" class="reset-btn" @click="openCreateTag">元数据标签管理</button>
+        <span class="toolbar-count">共 {{ filteredList.length }} 个知识库</span>
+      </div>
     </section>
 
     <section class="table-wrap">
@@ -228,10 +304,71 @@ function searchReset() {
       <div v-if="filteredList.length === 0" class="empty-box">暂无知识库数据</div>
     </section>
 
+    <section class="tag-admin-card">
+      <div class="tag-admin-head">
+        <div>
+          <div class="tag-admin-title">上传元数据标签</div>
+          <div class="tag-admin-desc">知识库上传时支持标注元数据；标签项由后台统一 CRUD 管理，便于后续检索、过滤与治理。</div>
+        </div>
+        <button type="button" class="create-btn" @click="openCreateTag">
+          <PlusOutlined class="h-4 w-4" /> 新增标签
+        </button>
+      </div>
+      <div class="tag-admin-grid">
+        <article v-for="tag in store.metadataTags" :key="tag.id" class="tag-admin-item">
+          <div class="tag-admin-item-head">
+            <div>
+              <div class="tag-admin-name">{{ tag.name }}</div>
+              <div class="tag-admin-code">{{ tag.code }}</div>
+            </div>
+            <span class="tag-admin-badge">{{ tag.required ? '必填' : '选填' }}</span>
+          </div>
+          <div class="tag-admin-meta">{{ tag.valueType === 'enum' ? '枚举标签' : '文本标签' }}</div>
+          <div class="tag-admin-options" :title="tag.options.join('、')">{{ tag.valueType === 'enum' ? (tag.options.join('、') || '暂无枚举项') : '自由输入' }}</div>
+          <div class="tag-admin-line">{{ tag.description || '暂无说明' }}</div>
+          <div class="tag-admin-actions">
+            <button type="button" class="text-btn" @click="openEditTag(tag.id)">编辑</button>
+            <button type="button" class="text-btn" @click="removeTag(tag.id)">删除</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
     <div class="note-box">说明：知识库列表页只保留“管理文档、编辑”两个高频操作，状态切换、向量化、清空文档、删除等收拢至“更多”，避免列表信息换行变形。</div>
 
     <AiKnowledgeBaseModal :visible="open" :knowledge="editingKnowledge || undefined" @ok="saveKnowledge" @cancel="closeModal" />
     <KnowledgeDocumentManagerModal :visible="docManagerVisible" :knowledge-base="activeKnowledgeForDocs" @close="docManagerVisible = false" />
+    <a-modal
+      :title="editingTagId ? '编辑元数据标签' : '新增元数据标签'"
+      :open="tagModalOpen"
+      width="560px"
+      @ok="saveTag"
+      @cancel="tagModalOpen = false"
+    >
+      <a-form layout="vertical">
+        <a-form-item label="标签名称" required>
+          <a-input v-model:value="tagForm.name" placeholder="例如：所属场景" />
+        </a-form-item>
+        <a-form-item label="标签编码" required>
+          <a-input v-model:value="tagForm.code" placeholder="例如：scene" />
+        </a-form-item>
+        <a-form-item label="值类型">
+          <a-radio-group v-model:value="tagForm.valueType">
+            <a-radio-button value="enum">枚举</a-radio-button>
+            <a-radio-button value="text">文本</a-radio-button>
+          </a-radio-group>
+        </a-form-item>
+        <a-form-item label="是否必填">
+          <a-switch v-model:checked="tagForm.required" />
+        </a-form-item>
+        <a-form-item v-if="tagForm.valueType === 'enum'" label="枚举项">
+          <a-input v-model:value="tagForm.optionsText" placeholder="多个值用顿号或逗号分隔" />
+        </a-form-item>
+        <a-form-item label="说明">
+          <a-textarea v-model:value="tagForm.description" :rows="3" placeholder="说明该标签在检索或治理中的用途" />
+        </a-form-item>
+      </a-form>
+    </a-modal>
   </div>
 </template>
 
@@ -286,6 +423,20 @@ td { border-top: 1px solid #f1f5f9; color: #475569; padding: 14px 16px; vertical
 .menu-popover button.danger { color: #be123c; }
 .menu-popover button.danger:hover { background: #fff1f2; color: #be123c; }
 .empty-box { padding: 24px; text-align: center; color: #94a3b8; font-size: 13px; }
+.tag-admin-card { margin-top: 18px; border-radius: 24px; border: 1px solid #e2e8f0; background: #fff; padding: 18px; box-shadow: 0 14px 36px rgba(15,23,42,.05); }
+.tag-admin-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.tag-admin-title { font-size: 16px; font-weight: 800; color: #0f172a; }
+.tag-admin-desc { margin-top: 4px; font-size: 12px; line-height: 1.7; color: #64748b; }
+.tag-admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+.tag-admin-item { border-radius: 18px; border: 1px solid #dbeafe; background: linear-gradient(180deg, #fcfdff, #f8fbff); padding: 14px; }
+.tag-admin-item-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.tag-admin-name { font-size: 14px; font-weight: 800; color: #0f172a; }
+.tag-admin-code { margin-top: 4px; font-size: 12px; color: #64748b; }
+.tag-admin-badge { border-radius: 999px; background: #eff6ff; color: #1d4ed8; padding: 4px 8px; font-size: 11px; font-weight: 800; }
+.tag-admin-meta { margin-top: 8px; font-size: 12px; color: #475569; }
+.tag-admin-options { margin-top: 8px; font-size: 12px; line-height: 1.6; color: #0f172a; }
+.tag-admin-line { margin-top: 8px; font-size: 12px; line-height: 1.6; color: #64748b; }
+.tag-admin-actions { margin-top: 12px; display: flex; gap: 8px; }
 .note-box { margin-top: 14px; border-radius: 18px; background: #fefce8; color: #854d0e; padding: 12px 14px; font-size: 12px; line-height: 1.7; box-shadow: inset 0 0 0 1px #fde68a; }
 @media (max-width: 900px) {
   .manage-header { flex-direction: column; }

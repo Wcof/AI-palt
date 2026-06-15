@@ -124,3 +124,49 @@ python scripts/prdctl.py audit . --level strict --prd-root docs/product
 3. 当前代码实现
 
 如果根据用户最新描述修改了代码，必须同步修正 PRD。
+
+## UI 设计规范
+
+### 搜索与筛选工具栏
+
+搜索条件区统一使用工具栏风格，参考 `AiKnowledgeBaseList.vue`：
+
+1. **布局**：横向 `flex` 布局，左输入右按钮，间距 `8px`
+2. **输入框容器**：`position: relative`，用于放置内部清空按钮
+3. **输入框样式**：
+   - 高度 `36px`，圆角 `10px`，白底
+   - 边框 `1px solid #d1e8ff`
+   - 字体 `13px`，文字色 `#1f2d3d`
+   - 右侧预留 `padding-right: 36px` 给清空按钮
+4. **清空按钮**：
+   - 输入框内右侧居中，尺寸 `22×22`
+   - 透明底，默认浅蓝灰 `#94a3b8`
+   - hover 变主蓝 `#0098ff` + 淡蓝圆形背景 `rgba(0,152,255,.1)`
+5. **筛选控件**：
+   - 筛选条件使用 `<select>` 下拉框，不用图标按钮
+   - 下拉框样式：高度 `36px`，圆角 `10px`，白底，边框 `#d1e8ff`
+   - 字体 `13px`，文字色 `#1f2d3d`
+6. **操作按钮**（非筛选类）：
+   - 纯图标按钮尺寸 `36×36`，圆角 `12px`
+   - 主按钮用蓝底白图标，带轻阴影和轻微上浮 hover
+7. **整体视觉**：浅蓝、轻阴影、圆角、工具栏感，不要重表单风格或深色筛选条
+
+### 工具栏容器
+
+```css
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  border-radius: 22px;
+  background: #f8fafc;
+  padding: 10px 12px;
+  box-shadow: inset 0 0 0 1px #e2e8f0;
+}
+```
+
+### 参考组件
+
+- 知识库列表页：`src/views/ai/settings/aiknowledge/AiKnowledgeBaseList.vue`

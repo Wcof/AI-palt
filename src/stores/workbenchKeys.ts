@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
+import { useNewAIStore } from '@/stores/newAI'
 
 export type ApiKeyStatus = 'enabled' | 'disabled'
 export type ApiKey = {
@@ -27,6 +28,7 @@ function genKey() {
 }
 
 export const useWorkbenchKeysStore = defineStore('workbenchKeys', () => {
+  const newAIStore = useNewAIStore()
   const keys = ref<ApiKey[]>([
     { id: 'key-demo', name: '演示密钥', keyValue: 'sk-demo0000000000000000000000000000000000000001', appId: 'app-demo', status: 'enabled', expiresAt: null, knowledgeBase: ['kb-safety-production'], agentKnowledgeBase: ['kb-safety-production'], aiSkill: ['llm-nl2sql', 'mcp-tool-registry'], aiAgent: ['agent-report-writer'], createdAt: Date.now() - 86400000 * 3, createdBy: 'system', updatedAt: Date.now() - 3600000 },
   ])
@@ -40,10 +42,12 @@ export const useWorkbenchKeysStore = defineStore('workbenchKeys', () => {
       knowledgeBase, agentKnowledgeBase: knowledgeBase, aiSkill: p.aiSkill ?? [], aiAgent: p.aiAgent ?? [],
       createdAt: now, createdBy: p.createdBy ?? '', updatedAt: now,
     })
+    newAIStore.logAudit('API 密钥', 'create', '-', `${p.name}/${p.appId ?? '-'}`)
   }
   function updateKey(p: { id: string; name?: string; status?: ApiKeyStatus; expiresAt?: number | null; knowledgeBase?: string[]; agentKnowledgeBase?: string[]; aiSkill?: string[]; aiAgent?: string[] }) {
     const k = keys.value.find(x => x.id === p.id)
     if (!k) return
+    const before = JSON.stringify({ name: k.name, status: k.status, expiresAt: k.expiresAt, knowledgeBase: k.knowledgeBase, aiSkill: k.aiSkill, aiAgent: k.aiAgent })
     if (p.name !== undefined) k.name = p.name
     if (p.status !== undefined) k.status = p.status
     if (p.expiresAt !== undefined) k.expiresAt = p.expiresAt
@@ -54,9 +58,19 @@ export const useWorkbenchKeysStore = defineStore('workbenchKeys', () => {
     if (p.aiSkill !== undefined) k.aiSkill = p.aiSkill
     if (p.aiAgent !== undefined) k.aiAgent = p.aiAgent
     k.updatedAt = Date.now()
+    newAIStore.logAudit('API 密钥', 'update', before, JSON.stringify({ name: k.name, status: k.status, expiresAt: k.expiresAt, knowledgeBase: k.knowledgeBase, aiSkill: k.aiSkill, aiAgent: k.aiAgent }))
   }
-  function deleteKey(id: string) { keys.value = keys.value.filter(x => x.id !== id) }
-  function deleteKeys(ids: string[]) { const set = new Set(ids); keys.value = keys.value.filter(x => !set.has(x.id)) }
+  function deleteKey(id: string) {
+    const before = keys.value.find(x => x.id === id)
+    keys.value = keys.value.filter(x => x.id !== id)
+    if (before) newAIStore.logAudit('API 密钥', 'delete', JSON.stringify(before), '-')
+  }
+  function deleteKeys(ids: string[]) {
+    const set = new Set(ids)
+    const before = keys.value.filter(x => set.has(x.id))
+    keys.value = keys.value.filter(x => !set.has(x.id))
+    before.forEach(item => newAIStore.logAudit('API 密钥', 'delete', JSON.stringify(item), '-'))
+  }
   function setKeysStatus(ids: string[], status: ApiKeyStatus) { const set = new Set(ids); const now = Date.now(); keys.value.forEach(k => { if (set.has(k.id)) { k.status = status; k.updatedAt = now } }) }
   function resetKeys() { keys.value = [] }
   function onAppDeleted(appId: string) { keys.value = keys.value.filter(k => k.appId !== appId) }

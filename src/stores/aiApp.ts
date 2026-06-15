@@ -3,6 +3,7 @@ import { defineStore } from 'pinia'
 import { streamChatAnswer } from '@/api/chatStream'
 import { useNL2SQLStore } from '@/stores/nl2sql'
 import { useReportStore } from '@/stores/report'
+import { useNewAIStore } from '@/stores/newAI'
 import type { DomainTerm, JdbcDataSource, ReportConfig, ReportTemplate } from '@/types/aiPlatform'
 
 export type ChatRole = 'user' | 'assistant'
@@ -15,6 +16,13 @@ export type ChatMessage = {
   content: string
   createdAt: number
   image?: string
+  modelSource?: string
+  modelName?: string
+  modelVersion?: string
+  latencyMs?: number
+  uploadedFiles?: string[]
+  ocrText?: string
+  logId?: string
 }
 
 export type AgentOption = {
@@ -48,17 +56,21 @@ export type Conversation = {
   reportPanelOpen?: boolean
   reportDocuments?: ReportDocument[]
   activeReportDocumentId?: string
+  pendingClarification?: {
+    originalQuestion: string
+    assistantMessageId: string
+    options: string[]
+  } | null
   messages: ChatMessage[]
 }
 
 export const AI_AGENT_OPTIONS: AgentOption[] = [
   { id: 'general', name: '通用助手', desc: '安全生产问答、方案梳理、材料润色', badge: 'Chat' },
   { id: 'nl2sql', name: '智能问数', desc: '结合 Case、术语和 JDBC 单数据源进行智能问数', badge: 'SQL' },
-  { id: 'report', name: '文档助手', desc: '生成报告、总结和方案文档，支持 Markdown / Doc 导出', badge: 'Doc' },
-  { id: 'meeting', name: '会议纪要', desc: '实时录音转写、摘要、纪要、待办和原文归档', badge: 'Minutes' },
   { id: 'document', name: '文档编写', desc: '根据问题生成文档摘要、正文预览和文档块', badge: 'Write' },
-  { id: 'hazard', name: '隐患识图', desc: '图片隐患识别与整改建议', badge: 'Vision' },
+  { id: 'meeting', name: '会议纪要', desc: '实时录音转写、摘要、纪要、待办和原文归档', badge: 'Minutes' },
   { id: 'rag', name: '知识库问答', desc: '从知识库中检索依据并生成可解释回答', badge: 'RAG' },
+  { id: 'hazard', name: '隐患识图', desc: '图片隐患识别与整改建议', badge: 'Vision' },
 ]
 
 function makeId(prefix: string) {
@@ -222,6 +234,23 @@ function makeMeetingMinutesDraft(input: string) {
   ].join('\n')
 }
 
+function makeClarificationPrompt(agentType: AgentType, input: string) {
+  const topic = input.replace(/\s+/g, ' ').slice(0, 20) || '当前问题'
+  const optionsMap: Record<AgentType, string[]> = {
+    general: ['补充业务背景', '明确输出形式', '限定时间范围'],
+    rag: ['指定知识范围', '补充业务背景', '明确你要的结论'],
+    nl2sql: ['明确统计口径', '补充时间范围', '指定查询维度'],
+    report: ['说明报告对象', '明确报告结构', '补充时间范围'],
+    hazard: ['补充现场场景', '说明图片重点', '明确输出要求'],
+    meeting: ['补充会议主题', '明确纪要格式', '说明参会对象'],
+    document: ['说明文档对象', '明确文档结构', '补充业务背景'],
+  }
+  return {
+    content: `你的问题我可以继续处理，但当前信息还有歧义。为了更准确输出「${topic}」，请先补充一项关键信息。`,
+    options: optionsMap[agentType] || optionsMap.general,
+  }
+}
+
 export const useAIAppStore = defineStore('aiApp', () => {
   const conversations = ref<Conversation[]>([])
   const activeConversationId = ref<string | null>(null)
@@ -255,6 +284,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
     conv.reportPanelOpen = isSplitAgent(agentType)
     conv.reportDocuments = isSplitAgent(agentType) ? [] : undefined
     conv.activeReportDocumentId = undefined
+    conv.pendingClarification = null
     conv.messages = []
     selectedAgentType.value = agentType
     agentFocused.value = focused
@@ -304,6 +334,14 @@ export const useAIAppStore = defineStore('aiApp', () => {
       activeConversationId.value = sortedConversations.value[0]?.id ?? null
       selectedAgentType.value = activeConversation.value?.agentType ?? 'general'
     }
+  }
+
+  function renameConversation(id: string, title: string) {
+    const conv = conversations.value.find(c => c.id === id)
+    const nextTitle = title.trim()
+    if (!conv || !nextTitle) return
+    conv.title = nextTitle.length > 32 ? `${nextTitle.slice(0, 32)}...` : nextTitle
+    conv.updatedAt = Date.now()
   }
 
   function switchConversation(id: string) {
@@ -367,6 +405,85 @@ export const useAIAppStore = defineStore('aiApp', () => {
     if (last?.role === 'assistant') last.content += token
   }
 
+  function createAssistantMessage(): ChatMessage {
+    const newAIStore = useNewAIStore()
+    return {
+      id: makeId('assistant'),
+      role: 'assistant',
+      content: '',
+      createdAt: Date.now(),
+      modelSource: newAIStore.activeModel.source === 'local' ? '本地模型' : newAIStore.activeModel.vendor,
+      modelName: newAIStore.activeModel.name,
+      modelVersion: newAIStore.activeModel.version,
+      latencyMs: newAIStore.activeModel.latencyMs,
+      logId: makeId('log'),
+    }
+  }
+
+  function createUserMessage(content: string): ChatMessage {
+    return {
+      id: makeId('user'),
+      role: 'user',
+      content,
+      createdAt: Date.now(),
+    }
+  }
+
+  function recordTrace(conv: Conversation, assistantMsg: ChatMessage, agentType: AgentType, summary: string) {
+    const newAIStore = useNewAIStore()
+    const stepMap: Record<AgentType, Array<{ type: 'intent' | 'rewrite' | 'rag' | 'tool' | 'model' | 'guard'; title: string; detail: string; durationMs: number; status: 'success' | 'warning' }>> = {
+      general: [
+        { type: 'intent', title: '意图识别', detail: '识别为通用安全生产咨询与方案整理请求。', durationMs: 180, status: 'success' },
+        { type: 'guard', title: '范围校验', detail: '校验输出是否符合当前 Agent 能力边界。', durationMs: 140, status: 'success' },
+        { type: 'model', title: '模型生成', detail: `使用 ${newAIStore.activeModel.name} 生成最终答案。`, durationMs: 1680, status: 'success' },
+      ],
+      rag: [
+        { type: 'intent', title: '问题归类', detail: '识别为知识库问答请求。', durationMs: 160, status: 'success' },
+        { type: 'rag', title: '知识召回', detail: '命中知识库文档片段与依据条文。', durationMs: 760, status: 'success' },
+        { type: 'model', title: '答案生成', detail: `基于召回上下文由 ${newAIStore.activeModel.name} 生成回答。`, durationMs: 1740, status: 'success' },
+      ],
+      nl2sql: [
+        { type: 'intent', title: '问数识别', detail: '识别为自然语言问数请求。', durationMs: 150, status: 'success' },
+        { type: 'rewrite', title: '口径改写', detail: '结合 Case 与专有名词生成查询口径。', durationMs: 420, status: 'success' },
+        { type: 'tool', title: 'SQL 生成', detail: '生成单数据源 SQL 与图表结果。', durationMs: 930, status: 'success' },
+        { type: 'model', title: '结果解释', detail: '对查询结果进行自然语言总结。', durationMs: 960, status: 'success' },
+      ],
+      report: [
+        { type: 'intent', title: '文档意图识别', detail: '识别为报告编写请求。', durationMs: 150, status: 'success' },
+        { type: 'rewrite', title: '结构改写', detail: '整理为报告摘要、发现、建议等章节。', durationMs: 420, status: 'success' },
+        { type: 'model', title: '正文生成', detail: '生成 Markdown 报告正文。', durationMs: 1880, status: 'success' },
+      ],
+      meeting: [
+        { type: 'tool', title: '录音转写', detail: '模拟将会议原文转写为文本。', durationMs: 820, status: 'success' },
+        { type: 'rewrite', title: '纪要提炼', detail: '提炼摘要、待办和纪要结构。', durationMs: 630, status: 'success' },
+        { type: 'model', title: '结果生成', detail: '输出会议纪要与待办事项。', durationMs: 1120, status: 'success' },
+      ],
+      document: [
+        { type: 'intent', title: '文档请求识别', detail: '识别为结构化文档编写任务。', durationMs: 160, status: 'success' },
+        { type: 'rewrite', title: '写作大纲生成', detail: '生成摘要、正文与行动项结构。', durationMs: 460, status: 'success' },
+        { type: 'model', title: '文档正文生成', detail: '输出完整文档草稿。', durationMs: 1750, status: 'success' },
+      ],
+      hazard: [
+        { type: 'tool', title: '图像识别', detail: '执行隐患目标检测与视觉理解。', durationMs: 980, status: 'success' },
+        { type: 'guard', title: '风险校验', detail: '按高/中/低风险等级输出整改建议。', durationMs: 260, status: 'success' },
+        { type: 'model', title: '结果生成', detail: '组织识图结果与整改建议。', durationMs: 1180, status: 'success' },
+      ],
+    }
+    const steps = stepMap[agentType].map((step, index) => ({
+      id: `${assistantMsg.id}-trace-${index + 1}`,
+      ...step,
+    }))
+    newAIStore.recordAgentInvocationTrace({
+      conversationId: conv.id,
+      messageId: assistantMsg.id,
+      agentName: agentType,
+      summary,
+      totalLatencyMs: steps.reduce((sum, item) => sum + item.durationMs, 0),
+      totalTokens: Math.max(assistantMsg.content.length * 3, 1200),
+      steps,
+    })
+  }
+
   function ensureReportDocument(conv: Conversation, input: string, template?: ReportTemplate | null) {
     const now = Date.now()
     if (!conv.reportDocuments) conv.reportDocuments = []
@@ -418,6 +535,24 @@ export const useAIAppStore = defineStore('aiApp', () => {
 
   async function sleep(ms: number) {
     await new Promise(resolve => setTimeout(resolve, ms))
+  }
+
+  function resetConversationArtifacts(conv: Conversation) {
+    if (!isSplitAgent(conv.agentType || 'general')) return
+    conv.reportStatus = 'idle'
+    conv.reportError = ''
+    conv.reportMarkdown = workspaceInitialMarkdown(conv.agentType || 'general')
+    conv.reportDocuments = []
+    conv.activeReportDocumentId = undefined
+    conv.reportPanelOpen = true
+  }
+
+  function truncateConversationFromIndex(conv: Conversation, startIndex: number) {
+    if (startIndex < 0 || startIndex >= conv.messages.length) return false
+    conv.messages.splice(startIndex)
+    resetConversationArtifacts(conv)
+    conv.updatedAt = Date.now()
+    return true
   }
 
   async function appendStream(conv: Conversation, text: string, delay = 14) {
@@ -504,21 +639,8 @@ export const useAIAppStore = defineStore('aiApp', () => {
     updateActiveReportDocument(conv, { content: conv.reportMarkdown || '', status: 'done', format: 'markdown' })
   }
 
-  async function sendMessage(conversationId: string, content: string) {
-    const conv = conversations.value.find(c => c.id === conversationId)
-    if (!conv) return
-    const text = content.trim()
-    if (!text) return
-
-    const agentType = conv.agentType ?? selectedAgentType.value
-    error.value = null
-    lastSent.value = { conversationId, type: 'text', content: text }
-
-    const userMsg: ChatMessage = { id: makeId('user'), role: 'user', content: text, createdAt: Date.now() }
-    conv.messages.push(userMsg)
-    if (conv.messages.length === 1) conv.title = generateTitle(text, agentType)
-
-    const assistantMsg: ChatMessage = { id: makeId('assistant'), role: 'assistant', content: '', createdAt: Date.now() }
+  async function runAssistantResponse(conversationId: string, conv: Conversation, text: string, agentType: AgentType) {
+    const assistantMsg: ChatMessage = createAssistantMessage()
     conv.messages.push(assistantMsg)
     conv.updatedAt = Date.now()
 
@@ -526,7 +648,6 @@ export const useAIAppStore = defineStore('aiApp', () => {
     streamAbort?.abort()
     streamAbort = ac
     streamingConversationId.value = conversationId
-
     try {
       if (agentType === 'report') {
         conv.reportPanelOpen = true
@@ -534,6 +655,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
         await appendStream(conv, '已开始生成报告。右侧会打开文档预览，你可以查看正文、复制全文或导出为 Markdown / Doc。\n', 8)
         await streamReport(conv, text)
         await appendStream(conv, '\n报告已生成。你可以继续补充修改要求，或在右侧复制 / 导出当前报告。', 8)
+        recordTrace(conv, assistantMsg, agentType, '完成报告结构拆解、正文生成与右侧文档预览联动。')
         return
       }
 
@@ -543,6 +665,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
         await appendStream(conv, '已进入文档编写工作台。右侧将生成文档块和正文预览，左侧会保留文档卡片，便于切换不同草稿。\n', 8)
         await streamDocument(conv, text)
         await appendStream(conv, '\n文档草稿已生成。左侧文档卡片与右侧预览保持联动，支持切换查看、复制与导出。', 8)
+        recordTrace(conv, assistantMsg, agentType, '完成文档结构化编写与文档块沉淀。')
         return
       }
 
@@ -552,6 +675,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
         await appendStream(conv, '\n实时转写模拟：\n00:00 已开始录音。\n00:42 正在识别发言人和会议主题。\n01:18 正在提取关键结论与待办事项。\n', 8)
         await streamMeetingMinutes(conv, text)
         await appendStream(conv, '\n会议纪要已生成。你可以继续补充原文，右侧将持续更新纪要。', 8)
+        recordTrace(conv, assistantMsg, agentType, '完成会议转写、纪要提炼与待办生成。')
         return
       }
 
@@ -597,6 +721,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
           '',
           '范围说明：本期只做 JDBC 单数据源，不做多数据源、跨库查询和自动 SQL 优化。',
         ].join('\n'), 8)
+        recordTrace(conv, assistantMsg, agentType, '完成 NL2SQL 口径匹配、SQL 生成与图表摘要输出。')
         return
       }
 
@@ -609,6 +734,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
         signal: ac.signal,
         onToken: token => appendToLastAssistant(conv, token),
       })
+      recordTrace(conv, assistantMsg, agentType, agentType === 'rag' ? '完成知识库召回与依据化回答生成。' : '完成通用问答生成。')
     } catch (e: any) {
       const msg = typeof e?.message === 'string' ? e.message : '请求失败'
       error.value = msg
@@ -619,6 +745,50 @@ export const useAIAppStore = defineStore('aiApp', () => {
       conv.updatedAt = Date.now()
       if (streamingConversationId.value === conversationId) streamingConversationId.value = null
     }
+  }
+
+  function startClarification(conversationId: string, content: string) {
+    const conv = conversations.value.find(c => c.id === conversationId)
+    if (!conv) return
+    const text = content.trim()
+    if (!text) return
+
+    const agentType = conv.agentType ?? selectedAgentType.value
+    error.value = null
+    lastSent.value = { conversationId, type: 'text', content: text }
+
+    conv.messages.push(createUserMessage(text))
+    if (conv.messages.length === 1) conv.title = generateTitle(text, agentType)
+
+    const clarification = makeClarificationPrompt(agentType, text)
+    const assistantMsg = createAssistantMessage()
+    assistantMsg.content = clarification.content
+    conv.messages.push(assistantMsg)
+    conv.pendingClarification = {
+      originalQuestion: text,
+      assistantMessageId: assistantMsg.id,
+      options: clarification.options,
+    }
+    conv.updatedAt = Date.now()
+  }
+
+  async function resolveClarification(conversationId: string, answer: string) {
+    const conv = conversations.value.find(c => c.id === conversationId)
+    if (!conv || !conv.pendingClarification) return
+    const text = answer.trim()
+    if (!text) return
+
+    const agentType = conv.agentType ?? selectedAgentType.value
+    const finalPrompt = `${conv.pendingClarification.originalQuestion}\n\n补充信息：${text}`
+    lastSent.value = { conversationId, type: 'text', content: finalPrompt }
+    conv.messages.push(createUserMessage(text))
+    conv.pendingClarification = null
+    conv.updatedAt = Date.now()
+    await runAssistantResponse(conversationId, conv, finalPrompt, agentType)
+  }
+
+  async function sendMessage(conversationId: string, content: string) {
+    startClarification(conversationId, content)
   }
 
   async function sendImageAnalysis(conversationId: string, image: string) {
@@ -639,7 +809,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
     conv.messages.push(userMsg)
     if (conv.messages.length === 1) conv.title = '隐患识图分析'
 
-    const assistantMsg: ChatMessage = { id: makeId('assistant'), role: 'assistant', content: '', createdAt: Date.now() }
+    const assistantMsg: ChatMessage = createAssistantMessage()
     conv.messages.push(assistantMsg)
     conv.updatedAt = Date.now()
     streamingConversationId.value = conversationId
@@ -680,6 +850,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
         }
       }
       await appendStream(conv, report, 10)
+      recordTrace(conv, assistantMsg, 'hazard', '完成现场图片隐患识别、风险分级与整改建议生成。')
     } catch (e: any) {
       const msg = typeof e?.message === 'string' ? e.message : '识图分析失败'
       error.value = msg
@@ -701,6 +872,39 @@ export const useAIAppStore = defineStore('aiApp', () => {
     }
   }
 
+  async function rewriteConversationFromUserMessage(conversationId: string, messageId: string, newContent: string) {
+    const conv = conversations.value.find(c => c.id === conversationId)
+    if (!conv) return
+    const targetIndex = conv.messages.findIndex(message => message.id === messageId && message.role === 'user')
+    if (targetIndex === -1) return
+    const text = newContent.trim()
+    if (!text) return
+
+    truncateConversationFromIndex(conv, targetIndex)
+    await sendMessage(conversationId, text)
+  }
+
+  async function regenerateFromAssistantMessage(conversationId: string, assistantMessageId: string) {
+    const conv = conversations.value.find(c => c.id === conversationId)
+    if (!conv) return
+
+    const assistantIndex = conv.messages.findIndex(message => message.id === assistantMessageId && message.role === 'assistant')
+    if (assistantIndex === -1) return
+
+    let userIndex = -1
+    for (let i = assistantIndex - 1; i >= 0; i -= 1) {
+      if (conv.messages[i].role === 'user') {
+        userIndex = i
+        break
+      }
+    }
+    if (userIndex === -1) return
+
+    const userMessage = conv.messages[userIndex]
+    truncateConversationFromIndex(conv, userIndex)
+    await sendMessage(conversationId, userMessage.content)
+  }
+
   return {
     conversations,
     sortedConversations,
@@ -714,6 +918,7 @@ export const useAIAppStore = defineStore('aiApp', () => {
     lastSent,
     createConversation,
     deleteConversation,
+    renameConversation,
     switchConversation,
     setActiveAgent,
     clearAgentFocus,
@@ -722,8 +927,11 @@ export const useAIAppStore = defineStore('aiApp', () => {
     closeReportPanel,
     setActiveReportDocument,
     sendMessage,
+    resolveClarification,
     sendImageAnalysis,
     retryLast,
+    rewriteConversationFromUserMessage,
+    regenerateFromAssistantMessage,
   }
 }, {
   persist: { key: 'ai-app-store' },

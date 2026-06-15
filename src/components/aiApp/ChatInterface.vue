@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, watch, nextTick, computed, onBeforeUnmount } from 'vue'
-import { Send, Sparkles, Menu, ImagePlus, X, ChevronDown, FileText, Database, MessageSquare, BookOpen, ShieldAlert, CheckCircle2, Loader2, Command, MoreHorizontal, Play, Pause, Mic, RotateCcw, RotateCw, SlidersHorizontal } from 'lucide-vue-next'
-import type { AgentOption, AgentType, Conversation } from '@/stores/aiApp'
+import { Send, Sparkles, Menu, ImagePlus, X, ChevronDown, FileText, Database, MessageSquare, BookOpen, ShieldAlert, CheckCircle2, Loader2, Command, MoreHorizontal, Play, Pause, Mic, RotateCcw, RotateCw, SlidersHorizontal, ThumbsUp, ThumbsDown, Copy, Pencil } from 'lucide-vue-next'
+import { useAIAppStore, type AgentOption, type AgentType, type ChatMessage, type Conversation } from '@/stores/aiApp'
 import WelcomeScreen from '@/components/aiApp/WelcomeScreen.vue'
+import { useNewAIStore } from '@/stores/newAI'
 
 const props = defineProps<{
   conversation: Conversation | null
@@ -30,20 +31,39 @@ const emit = defineEmits<{
 const draft = ref('')
 const selectedImage = ref<string | null>(null)
 const fileInputRef = ref<HTMLInputElement | null>(null)
+const draftInputRef = ref<HTMLTextAreaElement | null>(null)
 const listRef = ref<HTMLDivElement | null>(null)
 const showAgentMore = ref(false)
 const agentAppQuery = ref('')
 const activeAppCategory = ref('smartQa')
 const selectedApplication = ref<{ name: string; desc: string; agentType: AgentType } | null>(null)
+const editingUserMessageId = ref<string | null>(null)
+const editingConversationId = ref<string | null>(null)
+const editingDraft = ref('')
+const dislikeDialogOpen = ref(false)
+const dislikeTargetMessage = ref<ChatMessage | null>(null)
+const dislikeCategory = ref<'令人反感' | '不安全' | '与事实不符' | '与指令不符' | '个性化设置问题' | '更多'>('与事实不符')
+const dislikeReason = ref('')
+const dislikeError = ref('')
+const clarificationText = ref('')
 const deepThinking = computed({
   get: () => props.thinkingMode,
   set: (v: boolean) => emit('toggle-thinking', v),
 })
+const aiStore = useAIAppStore()
+const newAIStore = useNewAIStore()
 
 const activeAgentType = computed(() => props.conversation?.agentType || props.selectedAgent)
 const currentAgent = computed<AgentOption>(() => props.agents.find(a => a.id === activeAgentType.value) || { id: 'general', name: '通用助手', desc: '安全生产问答、方案梳理、材料润色', badge: 'Chat' })
 const displayApplicationName = computed(() => selectedApplication.value?.name || currentAgent.value.name)
 const displayApplicationDesc = computed(() => selectedApplication.value?.desc || currentAgent.value.desc)
+const currentQuotaStatus = computed(() => newAIStore.userQuotaAllocations.find(item => item.userName === newAIStore.currentAccount?.name) || null)
+const currentQuotaWarning = computed(() => {
+  if (!currentQuotaStatus.value) return ''
+  if (currentQuotaStatus.value.status === 'exceeded') return '当前账号已超额，继续调用将按企业策略进行阻断或提示。'
+  if (currentQuotaStatus.value.status === 'warning') return '当前账号已接近额度上限，建议尽快补配企业或用户额度。'
+  return ''
+})
 const isReportAgent = computed(() => activeAgentType.value === 'report')
 const isMeetingAgent = computed(() => activeAgentType.value === 'meeting')
 const isDocumentAgent = computed(() => activeAgentType.value === 'document')
@@ -113,6 +133,7 @@ const agentApplications: AgentApplication[] = [
 ]
 
 const activeAppCategoryDesc = computed(() => appCategoryOptions.find(item => item.id === activeAppCategory.value)?.desc || '')
+const dislikeCategories: Array<'令人反感' | '不安全' | '与事实不符' | '与指令不符' | '个性化设置问题' | '更多'> = ['令人反感', '不安全', '与事实不符', '与指令不符', '个性化设置问题', '更多']
 
 const filteredAgentApplications = computed(() => {
   const keyword = agentAppQuery.value.trim().toLowerCase()
@@ -193,6 +214,8 @@ watch(activeAgentType, (type) => {
 watch(() => props.conversation?.id, () => {
   stopStopConfirmTimer()
   if (activeAgentType.value !== 'meeting') resetMeetingRecorder()
+  cancelEditing()
+  closeDislikeDialog()
 })
 
 onBeforeUnmount(() => {
@@ -385,7 +408,7 @@ function handleSend() {
   const text = draft.value.trim()
   if (!text || props.streaming) return
   const slashCommand = parseSlashCommand(text)
-  if (slashCommand) {
+  if (slashCommand && !editingUserMessageId.value) {
     emit('change-agent', slashCommand.agentType)
     draft.value = slashCommand.rest
     return
@@ -419,6 +442,140 @@ function handleSendImage() {
 
 function handlePromptSelect(text: string) {
   emit('select-prompt', text)
+}
+
+function submitClarification(answer: string) {
+  if (!props.conversation?.pendingClarification || props.streaming) return
+  const text = answer.trim()
+  if (!text) return
+  aiStore.resolveClarification(props.conversation.id, text)
+  clarificationText.value = ''
+}
+
+function copyMessage(content: string) {
+  navigator.clipboard.writeText(content)
+}
+
+function getTrace(message: ChatMessage) {
+  if (!props.conversation || message.role !== 'assistant') return null
+  return newAIStore.getAgentInvocationTrace(message.id, props.conversation.id)
+}
+
+function packConversationContext(messageId: string, content: string) {
+  if (!props.conversation) return
+  const userQuestion = [...props.conversation.messages].reverse().find(item => item.role === 'user')?.content || ''
+  const upload = newAIStore.uploads[0]
+  const ocrTask = newAIStore.ocrTasks[0]
+  newAIStore.createContextPack({
+    conversationId: props.conversation.id,
+    userQuestion,
+    aiAnswer: content,
+    agent: currentAgent.value.name,
+    modelSource: newAIStore.activeModel.source === 'local' ? '本地模型' : newAIStore.activeModel.vendor,
+    modelName: newAIStore.activeModel.name,
+    modelVersion: newAIStore.activeModel.version,
+    ragReferences: ['安全生产知识库/巡检规范', '案例库/事故复盘'],
+    toolCalls: activeAgentType.value === 'hazard' ? ['OCR', '隐患识图'] : ['Chat Completion'],
+    uploadedFiles: upload ? [upload.name] : [],
+    ocrText: ocrTask?.text || '',
+    logId: messageId,
+  })
+}
+
+function handlePackLatestContext() {
+  if (!props.conversation) return
+  const latestAssistant = [...props.conversation.messages].reverse().find(item => item.role === 'assistant' && item.content.trim())
+  if (!latestAssistant) return
+  packConversationContext(latestAssistant.logId || latestAssistant.id, latestAssistant.content)
+}
+
+function startEditingMessage(message: ChatMessage) {
+  if (!props.conversation || props.streaming) return
+  editingUserMessageId.value = message.id
+  editingConversationId.value = props.conversation.id
+  editingDraft.value = message.content
+}
+
+function cancelEditing() {
+  editingUserMessageId.value = null
+  editingConversationId.value = null
+  editingDraft.value = ''
+}
+
+function submitEditingMessage() {
+  if (!editingUserMessageId.value || !editingConversationId.value || props.streaming) return
+  const text = editingDraft.value.trim()
+  if (!text) return
+  aiStore.rewriteConversationFromUserMessage(editingConversationId.value, editingUserMessageId.value, text)
+  cancelEditing()
+}
+
+function regenerateAssistantMessage(message: ChatMessage) {
+  if (!props.conversation || props.streaming) return
+  aiStore.regenerateFromAssistantMessage(props.conversation.id, message.id)
+}
+
+function buildCoCreationPayload(message: ChatMessage, action: 'like' | 'dislike', extra?: { category?: '令人反感' | '不安全' | '与事实不符' | '与指令不符' | '个性化设置问题' | '更多'; reason?: string }) {
+  if (!props.conversation) return null
+  const targetIndex = props.conversation.messages.findIndex(item => item.id === message.id)
+  const previousUser = [...props.conversation.messages.slice(0, targetIndex)].reverse().find(item => item.role === 'user')
+  const start = Math.max(0, targetIndex - 6)
+  const end = Math.min(props.conversation.messages.length, targetIndex + 2)
+  const contextMessages = props.conversation.messages.slice(start, end).map(item => ({
+    role: item.role,
+    content: item.content,
+  }))
+  return {
+    messageId: message.id,
+    conversationId: props.conversation.id,
+    sessionId: props.conversation.id,
+    feedbackUser: '产品演示账号',
+    action,
+    question: previousUser?.content || '',
+    answer: message.content,
+    contextMessages,
+    status: '待处置' as const,
+    ...extra,
+  }
+}
+
+function handleLike(message: ChatMessage) {
+  const payload = buildCoCreationPayload(message, 'like')
+  if (!payload) return
+  newAIStore.addExpertCoCreation(payload)
+}
+
+function openDislikeDialog(message: ChatMessage) {
+  if (!props.conversation) return
+  const existing = newAIStore.getExpertCoCreationEntry(message.id, props.conversation.id, 'dislike')
+  dislikeTargetMessage.value = message
+  dislikeCategory.value = existing?.category || '与事实不符'
+  dislikeReason.value = existing?.reason || ''
+  dislikeError.value = ''
+  dislikeDialogOpen.value = true
+}
+
+function closeDislikeDialog() {
+  dislikeDialogOpen.value = false
+  dislikeTargetMessage.value = null
+  dislikeReason.value = ''
+  dislikeError.value = ''
+}
+
+function submitDislike() {
+  if (!props.conversation || !dislikeTargetMessage.value) return
+  const reason = dislikeReason.value.trim()
+  if (!reason) {
+    dislikeError.value = '请输入点踩原因。'
+    return
+  }
+  const payload = buildCoCreationPayload(dislikeTargetMessage.value, 'dislike', {
+    category: dislikeCategory.value,
+    reason,
+  })
+  if (!payload) return
+  newAIStore.addExpertCoCreation(payload)
+  closeDislikeDialog()
 }
 
 function escapeHtml(text: string) {
@@ -537,11 +694,11 @@ function parseReasoningContent(content: string): ReasoningView {
               </span>
               <span v-if="conversation?.title" class="hidden truncate text-slate-500 sm:inline">{{ conversation.title }}</span>
             </div>
+            </div>
           </div>
-        </div>
-        <div v-if="streaming" class="shrink-0 rounded-full px-3 py-1 text-[0.6875rem] ring-1" :class="thinkingMode && !isMeetingAgent ? 'bg-blue-50 text-blue-700 ring-blue-200' : 'bg-slate-100 text-slate-700 ring-slate-200'">
-          {{ thinkingMode && !isMeetingAgent ? 'AI 正在深度思考中…' : 'AI 正在输入…' }}
-        </div>
+          <div v-if="streaming" class="shrink-0 rounded-full px-3 py-1 text-[0.6875rem] ring-1" :class="thinkingMode && !isMeetingAgent ? 'bg-blue-50 text-blue-700 ring-blue-200' : 'bg-slate-100 text-slate-700 ring-slate-200'">
+            {{ thinkingMode && !isMeetingAgent ? 'AI 正在深度思考中…' : 'AI 正在输入…' }}
+          </div>
       </div>
     </div>
 
@@ -550,6 +707,10 @@ function parseReasoningContent(content: string): ReasoningView {
       <span v-else-if="isMeetingAgent" class="inline-flex items-center gap-1.5"><MessageSquare class="h-3.5 w-3.5 text-blue-600" /> 会议纪要已就绪：左侧只保留录音控制，右侧生成原文、摘要、会议纪要和待办。</span>
       <span v-else-if="isDocumentAgent" class="inline-flex items-center gap-1.5"><FileText class="h-3.5 w-3.5 text-blue-600" /> 文档编写已就绪：左侧提需求，右侧展示摘要、文档块和正文预览。</span>
       <span v-else class="inline-flex items-center gap-1.5"><Database class="h-3.5 w-3.5 text-blue-600" /> 智能问数按单 JDBC 数据源执行，结合 Case 与专有名词增强。</span>
+    </div>
+
+    <div v-if="currentQuotaWarning" class="border-b border-amber-200/80 bg-amber-50/80 px-4 py-2 text-xs text-amber-800 backdrop-blur sm:px-6">
+      {{ currentQuotaWarning }}
     </div>
 
     <div v-if="(isReportAgent || isMeetingAgent || isDocumentAgent) && conversation?.reportDocuments?.length" class="border-b border-blue-100 bg-blue-50/70 px-4 py-2 text-xs text-blue-800 sm:px-6">
@@ -587,7 +748,8 @@ function parseReasoningContent(content: string): ReasoningView {
     <div ref="listRef" class="min-h-0 flex-1 overflow-auto px-0 sm:px-1">
       <template v-if="conversation && conversation.messages.length">
         <div v-for="m in conversation.messages" :key="m.id" :class="m.role === 'user' ? 'flex justify-end px-3 py-2 sm:px-5' : 'flex justify-start px-3 py-2 sm:px-5'">
-          <div :class="['max-w-[min(56.25rem,88vw)] rounded-[1.375rem] px-4 py-3 text-sm leading-6 ring-1 shadow-[0_0.625rem_2.125rem_rgba(37,99,235,0.08)]', m.role === 'user' ? 'bg-gradient-to-br from-blue-600 to-cyan-500 text-white ring-white/20' : thinkingMode ? 'bg-gradient-to-br from-white to-blue-50/80 text-slate-900 ring-blue-200/80' : 'bg-gradient-to-br from-white to-sky-50/70 text-slate-900 ring-blue-100/80']">
+          <div :class="['group flex flex-col', editingUserMessageId === m.id ? 'max-w-[min(62rem,92vw)]' : 'max-w-[min(56.25rem,88vw)]']">
+            <div :class="['rounded-[1.375rem] px-4 py-3 text-sm leading-6 ring-1 shadow-[0_0.625rem_2.125rem_rgba(37,99,235,0.08)]', m.role === 'user' ? 'bg-gradient-to-br from-blue-600 to-cyan-500 text-white ring-white/20' : thinkingMode ? 'bg-gradient-to-br from-white to-blue-50/80 text-slate-900 ring-blue-200/80' : 'bg-gradient-to-br from-white to-sky-50/70 text-slate-900 ring-blue-100/80']">
             <img v-if="m.image" :src="m.image" alt="隐患识图上传图片" class="mb-2 max-h-60 w-auto rounded-xl border border-white/30 object-contain" />
             <div v-if="m.role === 'assistant'" class="pr-1">
               <template v-if="parseReasoningContent(m.content).hasReasoning">
@@ -622,7 +784,7 @@ function parseReasoningContent(content: string): ReasoningView {
               <div v-if="hasNl2sqlCharts(m.content)" class="nl2sql-chart-panel">
                 <div class="chart-panel-head">
                   <div>
-                    <div class="chart-title">智能问数基础图表 Mock</div>
+                    <div class="chart-title">智能问数基础图表</div>
                     <div class="chart-subtitle">同一组查询结果同步展示圆饼图、折线图、柱状图和表格明细。</div>
                   </div>
                   <span class="chart-badge">SQL + Chart</span>
@@ -666,7 +828,82 @@ function parseReasoningContent(content: string): ReasoningView {
                 <Loader2 class="h-3.5 w-3.5 animate-spin" /> 正在思考问题...
               </div>
             </div>
+            <div v-else-if="editingUserMessageId === m.id" class="space-y-3">
+              <textarea
+                v-model="editingDraft"
+                rows="4"
+                class="min-h-[8.5rem] w-[min(46rem,calc(100vw-3rem))] resize-y rounded-[1.375rem] bg-gradient-to-br from-blue-600 to-cyan-500 px-4 py-3 text-sm leading-6 text-white shadow-[0_0.625rem_2.125rem_rgba(37,99,235,0.08)] outline-none ring-1 ring-white/20 placeholder:text-blue-100"
+                @keydown.enter.exact.prevent="submitEditingMessage"
+              />
+              <div class="flex justify-end gap-2">
+                <button type="button" class="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50" @click="cancelEditing">取消</button>
+                <button type="button" class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-blue-700 disabled:opacity-50" :disabled="!editingDraft.trim() || streaming" @click="submitEditingMessage">更新</button>
+              </div>
+            </div>
             <div v-else class="whitespace-pre-wrap">{{ m.content }}</div>
+            </div>
+            <details v-if="m.role === 'assistant' && m.content && getTrace(m)" class="trace-block">
+              <summary class="trace-summary">
+                <span>调用链路</span>
+                <span class="trace-summary-meta">{{ getTrace(m)?.totalLatencyMs }}ms / {{ getTrace(m)?.totalTokens }} tokens</span>
+              </summary>
+              <div class="trace-panel">
+                <div class="trace-title">{{ getTrace(m)?.summary }}</div>
+                <div class="trace-steps">
+                  <div v-for="step in getTrace(m)?.steps || []" :key="step.id" class="trace-step">
+                    <div class="trace-step-head">
+                      <span class="trace-step-type">{{ step.type }}</span>
+                      <span class="trace-step-name">{{ step.title }}</span>
+                      <span class="trace-step-latency">{{ step.durationMs }}ms</span>
+                    </div>
+                    <div class="trace-step-detail">{{ step.detail }}</div>
+                  </div>
+                </div>
+              </div>
+            </details>
+            <div v-if="m.role === 'assistant' && m.content" class="mt-2 flex items-center gap-1.5 pl-2 text-slate-500">
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-slate-700"
+                title="复制"
+                @click="copyMessage(m.content)"
+              >
+                <Copy class="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+                :disabled="streaming"
+                title="重新生成"
+                @click="regenerateAssistantMessage(m)"
+              >
+                <RotateCcw class="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-slate-700"
+                title="点赞"
+                @click="handleLike(m)"
+              >
+                <ThumbsUp class="h-4 w-4" />
+              </button>
+              <button
+                type="button"
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg transition hover:bg-slate-100 hover:text-slate-700"
+                title="点踩"
+                @click="openDislikeDialog(m)"
+              >
+                <ThumbsDown class="h-4 w-4" />
+              </button>
+            </div>
+            <div v-if="m.role === 'user' && editingUserMessageId !== m.id" class="mt-2 flex justify-end gap-2 opacity-0 transition group-hover:opacity-100">
+              <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-slate-700 ring-1 ring-blue-100 transition hover:bg-white" title="复制问题" aria-label="复制问题" @click="copyMessage(m.content)">
+                <Copy class="h-3.5 w-3.5" />
+              </button>
+              <button type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/85 text-slate-700 ring-1 ring-blue-100 transition hover:bg-white disabled:opacity-50" :disabled="streaming" title="修改问题" aria-label="修改问题" @click="startEditingMessage(m)">
+                <Pencil class="h-3.5 w-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </template>
@@ -714,8 +951,49 @@ function parseReasoningContent(content: string): ReasoningView {
         <button type="button" @click="emit('retry')" class="rounded-lg bg-white px-2 py-1 text-[0.6875rem] font-semibold text-rose-700 ring-1 ring-rose-200 transition hover:bg-white">重试</button>
       </div>
 
-      <div :class="['relative w-full backdrop-blur-xl', isMeetingAgent ? 'rounded-[1rem] border border-indigo-100/80 bg-white/80 px-1.5 py-1.5 shadow-[0_0.875rem_2.5rem_rgba(99,102,241,0.12)] ring-1 ring-white/90' : 'rounded-[1.875rem] border border-blue-200/80 bg-gradient-to-br from-white via-sky-50/90 to-blue-50/80 px-3 py-3 shadow-[0_1.5rem_5rem_rgba(37,99,235,0.16)] ring-1 ring-white/80 sm:px-4 sm:py-4']">
-        <div v-if="showSlashPalette" class="absolute bottom-[calc(100%+0.625rem)] left-3 z-[90] w-[min(32.5rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-[0_1.5rem_4.375rem_rgba(37,99,235,0.20)]">
+      <div :class="['relative w-full overflow-hidden backdrop-blur-xl', isMeetingAgent ? 'rounded-[1rem] border border-indigo-100/80 bg-white/80 px-1.5 py-1.5 shadow-[0_0.875rem_2.5rem_rgba(99,102,241,0.12)] ring-1 ring-white/90' : 'rounded-[1.875rem] border border-blue-200/80 bg-gradient-to-br from-white via-sky-50/90 to-blue-50/80 px-3 py-3 shadow-[0_1.5rem_5rem_rgba(37,99,235,0.16)] ring-1 ring-white/80 sm:px-4 sm:py-4']">
+        <transition
+          enter-active-class="transition duration-300 ease-out"
+          enter-from-class="translate-y-6 opacity-0"
+          enter-to-class="translate-y-0 opacity-100"
+          leave-active-class="transition duration-200 ease-in"
+          leave-from-class="translate-y-0 opacity-100"
+          leave-to-class="translate-y-6 opacity-0"
+        >
+          <div v-if="conversation?.pendingClarification" class="rounded-[1.5rem] border border-blue-100 bg-white/95 p-4 shadow-[0_1rem_2.5rem_rgba(37,99,235,0.12)]">
+            <div class="mb-2 text-sm font-semibold text-slate-900">请先补充信息</div>
+            <div class="mb-4 text-xs leading-5 text-slate-500">当前问题还存在歧义，请先补充一项关键信息，再继续生成正式回答。</div>
+            <div class="grid gap-2">
+              <button
+                v-for="option in conversation.pendingClarification.options"
+                :key="option"
+                type="button"
+                class="flex min-h-11 w-full items-center rounded-2xl bg-blue-50 px-4 py-3 text-left text-sm text-slate-800 ring-1 ring-blue-100 transition hover:bg-blue-100"
+                @click="submitClarification(option)"
+              >
+                {{ option }}
+              </button>
+            </div>
+            <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:gap-3">
+              <input
+                v-model="clarificationText"
+                type="text"
+                class="min-w-0 flex-1 rounded-2xl border border-sky-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none"
+                placeholder="其他补充信息"
+                @keydown.enter.prevent="submitClarification(clarificationText)"
+              />
+              <button
+                type="button"
+                class="rounded-2xl bg-slate-900 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                :disabled="!clarificationText.trim() || streaming"
+                @click="submitClarification(clarificationText)"
+              >
+                发送
+              </button>
+            </div>
+          </div>
+        </transition>
+        <div v-if="!conversation?.pendingClarification && showSlashPalette" class="absolute bottom-[calc(100%+0.625rem)] left-3 z-[90] w-[min(32.5rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-[0_1.5rem_4.375rem_rgba(37,99,235,0.20)]">
           <div class="flex items-center gap-2 border-b border-blue-50 px-3 py-2 text-xs font-semibold text-blue-700">
             <Command class="h-3.5 w-3.5" /> 输入 / 选择应用
           </div>
@@ -739,8 +1017,9 @@ function parseReasoningContent(content: string): ReasoningView {
 
 
 
-        <template v-if="!isMeetingAgent">
+        <template v-if="!conversation?.pendingClarification && !isMeetingAgent">
           <textarea
+            ref="draftInputRef"
             v-model="draft"
             @keydown.enter.exact.prevent="handleSend"
             rows="2"
@@ -767,7 +1046,7 @@ function parseReasoningContent(content: string): ReasoningView {
           </div>
         </template>
 
-        <div v-if="isMeetingAgent" class="meeting-audio-player" :class="{ 'is-recording': recordingState === 'recording', 'is-paused': recordingState === 'paused' }">
+        <div v-if="!conversation?.pendingClarification && isMeetingAgent" class="meeting-audio-player" :class="{ 'is-recording': recordingState === 'recording', 'is-paused': recordingState === 'paused' }">
           <button type="button" class="meeting-audio-icon" title="回到开头" @click="restartMeetingAudio">
             <RotateCcw class="h-4 w-4" />
           </button>
@@ -808,7 +1087,7 @@ function parseReasoningContent(content: string): ReasoningView {
           </button>
         </div>
 
-        <div v-if="!isMeetingAgent" class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-blue-100/80 pt-3">
+        <div v-if="!conversation?.pendingClarification && !isMeetingAgent" class="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-blue-100/80 pt-3">
           <div class="flex min-w-0 flex-1 flex-wrap items-center gap-2">
             <button
               v-if="!isMeetingAgent"
@@ -946,6 +1225,61 @@ function parseReasoningContent(content: string): ReasoningView {
         </div>
       </div>
     </div>
+
+    <Teleport to="body">
+      <div v-if="dislikeDialogOpen" class="fixed inset-0 z-[420] flex items-center justify-center bg-slate-950/35 px-4 py-6 backdrop-blur-sm" @click.self="closeDislikeDialog">
+        <div class="w-full max-w-lg rounded-[1.75rem] border border-blue-100 bg-white p-5 shadow-[0_1.5rem_4.375rem_rgba(15,23,42,0.22)]">
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <div class="text-base font-semibold text-slate-950">点踩反馈</div>
+              <div class="mt-1 text-sm text-slate-500">提交后进入专家共创，反馈类型和原因都保留在本地 mock 数据中。</div>
+            </div>
+            <button type="button" class="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-700" @click="closeDislikeDialog">
+              <X class="h-4 w-4" />
+            </button>
+          </div>
+
+          <div class="mt-5 space-y-4">
+            <div>
+              <div class="mb-2 text-sm font-medium text-slate-700">反馈类型</div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="category in dislikeCategories"
+                  :key="category"
+                  type="button"
+                  :class="[
+                    'rounded-full px-3 py-1.5 text-xs font-medium ring-1 transition',
+                    dislikeCategory === category ? 'bg-blue-600 text-white ring-blue-600' : 'bg-white text-slate-700 ring-slate-200 hover:bg-slate-50'
+                  ]"
+                  @click="dislikeCategory = category"
+                >
+                  {{ category }}
+                </button>
+              </div>
+            </div>
+
+            <label class="block">
+              <div class="mb-2 text-sm font-medium text-slate-700">点踩原因</div>
+              <textarea
+                v-model="dislikeReason"
+                rows="4"
+                class="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-blue-300 focus:bg-white"
+                placeholder="请输入为什么点踩，这条回答哪里有问题。"
+              />
+            </label>
+
+            <div v-if="dislikeError" class="rounded-2xl border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+              {{ dislikeError }}
+            </div>
+          </div>
+
+          <div class="mt-5 flex justify-end gap-2">
+            <button type="button" class="rounded-xl bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-200" @click="closeDislikeDialog">取消</button>
+            <button type="button" class="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-700" @click="submitDislike">提交反馈</button>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
@@ -1094,6 +1428,96 @@ function parseReasoningContent(content: string): ReasoningView {
 .agent-app-item {
   background: rgba(248, 251, 255, 0.72);
   border: 0.0625rem solid rgba(219, 234, 254, 0.78);
+}
+
+.trace-block {
+  margin-top: 0.625rem;
+  margin-left: 0.5rem;
+}
+
+.trace-summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  border-radius: 0.75rem;
+  background: #eff6ff;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #2563eb;
+}
+
+.trace-summary::-webkit-details-marker {
+  display: none;
+}
+
+.trace-summary-meta {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.trace-panel {
+  margin-top: 0.5rem;
+  width: min(34rem, 82vw);
+  border-radius: 1rem;
+  border: 0.0625rem solid #dbeafe;
+  background: white;
+  padding: 0.85rem;
+  box-shadow: 0 1rem 2.5rem rgba(37, 99, 235, 0.12);
+}
+
+.trace-title {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.trace-steps {
+  margin-top: 0.625rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.trace-step {
+  border-radius: 0.875rem;
+  background: #f8fafc;
+  padding: 0.625rem 0.75rem;
+}
+
+.trace-step-head {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.trace-step-type {
+  border-radius: 999px;
+  background: #dbeafe;
+  padding: 0.15rem 0.45rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  color: #1d4ed8;
+  text-transform: uppercase;
+}
+
+.trace-step-name {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.trace-step-latency {
+  font-size: 0.6875rem;
+  color: #64748b;
+}
+
+.trace-step-detail {
+  margin-top: 0.35rem;
+  font-size: 0.6875rem;
+  line-height: 1.35;
+  color: #475569;
 }
 
 

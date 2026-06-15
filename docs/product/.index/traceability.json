@@ -1,0 +1,1378 @@
+{
+  "generated_at": "2026-06-03",
+  "pages": {
+    "page-ability--id": {
+      "page_id": "page-ability--id",
+      "route": "ability/:id",
+      "code_paths": [
+        "../views/newAI/knowledge.vue"
+      ],
+      "feature_ids": [
+        "feat-ability--id-core"
+      ],
+      "change_ids": [
+        "chg-ability--id-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/ability--id.md",
+      "missing_sections": []
+    },
+    "page-agents": {
+      "page_id": "page-agents",
+      "route": "agents",
+      "code_paths": [
+        "../views/newAI/mcp.vue"
+      ],
+      "feature_ids": [
+        "feat-agents-core"
+      ],
+      "change_ids": [
+        "chg-agents-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/agents.md",
+      "missing_sections": []
+    },
+    "page-ai-app": {
+      "page_id": "page-ai-app",
+      "route": "ai-app",
+      "code_paths": [
+        "../views/newAI/apiKey.vue"
+      ],
+      "feature_ids": [
+        "feat-ai-app-core"
+      ],
+      "change_ids": [
+        "chg-ai-app-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/ai-app.md",
+      "missing_sections": []
+    },
+    "page-console": {
+      "page_id": "page-console",
+      "route": "console",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-console-core"
+      ],
+      "change_ids": [
+        "chg-console-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/console.md",
+      "missing_sections": []
+    },
+    "page-developers": {
+      "page_id": "page-developers",
+      "route": "developers",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-developers-core"
+      ],
+      "change_ids": [
+        "chg-developers-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/developers.md",
+      "missing_sections": []
+    },
+    "page-docs": {
+      "page_id": "page-docs",
+      "route": "docs",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-docs-core"
+      ],
+      "change_ids": [
+        "chg-docs-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/docs.md",
+      "missing_sections": []
+    },
+    "page-experience-agent": {
+      "page_id": "page-experience-agent",
+      "route": "experience/agent",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-experience-agent-core"
+      ],
+      "change_ids": [
+        "chg-experience-agent-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/experience-agent.md",
+      "missing_sections": []
+    },
+    "page-experience-mcp": {
+      "page_id": "page-experience-mcp",
+      "route": "experience/mcp",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-experience-mcp-core"
+      ],
+      "change_ids": [
+        "chg-experience-mcp-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/experience-mcp.md",
+      "missing_sections": []
+    },
+    "page-experience": {
+      "page_id": "page-experience",
+      "route": "experience",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-experience-core"
+      ],
+      "change_ids": [
+        "chg-experience-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/experience.md",
+      "missing_sections": []
+    },
+    "page-index": {
+      "page_id": "page-index",
+      "route": "/",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-index-core"
+      ],
+      "change_ids": [
+        "chg-index-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/index.md",
+      "missing_sections": []
+    },
+    "page-knowledge--id": {
+      "page_id": "page-knowledge--id",
+      "route": "knowledge/:id",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-knowledge--id-core"
+      ],
+      "change_ids": [
+        "chg-knowledge--id-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/knowledge--id.md",
+      "missing_sections": []
+    },
+    "page-knowledge": {
+      "page_id": "page-knowledge",
+      "route": "knowledge",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-knowledge-core"
+      ],
+      "change_ids": [
+        "chg-knowledge-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/knowledge.md",
+      "missing_sections": []
+    },
+    "page-mcp--id": {
+      "page_id": "page-mcp--id",
+      "route": "mcp/:id",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-mcp--id-core"
+      ],
+      "change_ids": [
+        "chg-mcp--id-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/mcp--id.md",
+      "missing_sections": []
+    },
+    "page-mcp": {
+      "page_id": "page-mcp",
+      "route": "mcp",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-mcp-core"
+      ],
+      "change_ids": [
+        "chg-mcp-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/mcp.md",
+      "missing_sections": []
+    },
+    "page-newAI-agent": {
+      "page_id": "page-newAI-agent",
+      "route": "newAI/agent",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-newAI-agent-core"
+      ],
+      "change_ids": [
+        "chg-newAI-agent-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/newAI-agent.md",
+      "missing_sections": []
+    },
+    "page-newAI-apiKey": {
+      "page_id": "page-newAI-apiKey",
+      "route": "newAI/apiKey",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-newAI-apiKey-core"
+      ],
+      "change_ids": [
+        "chg-newAI-apiKey-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/newAI-apiKey.md",
+      "missing_sections": []
+    },
+    "page-newAI-assistant": {
+      "page_id": "page-newAI-assistant",
+      "route": "newAI/assistant",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-newAI-assistant-core"
+      ],
+      "change_ids": [
+        "chg-newAI-assistant-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/newAI-assistant.md",
+      "missing_sections": []
+    },
+    "page-newAI-knowledge": {
+      "page_id": "page-newAI-knowledge",
+      "route": "newAI/knowledge",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-newAI-knowledge-core"
+      ],
+      "change_ids": [
+        "chg-newAI-knowledge-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/newAI-knowledge.md",
+      "missing_sections": []
+    },
+    "page-newAI-mcp": {
+      "page_id": "page-newAI-mcp",
+      "route": "newAI/mcp",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-newAI-mcp-core"
+      ],
+      "change_ids": [
+        "chg-newAI-mcp-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/newAI-mcp.md",
+      "missing_sections": []
+    },
+    "page-newAI-system": {
+      "page_id": "page-newAI-system",
+      "route": "newAI/system",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-newAI-system-core"
+      ],
+      "change_ids": [
+        "chg-newAI-system-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/newAI-system.md",
+      "missing_sections": []
+    },
+    "page-pathMatch": {
+      "page_id": "page-pathMatch",
+      "route": "/:pathMatch(.*)*",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-pathMatch-core"
+      ],
+      "change_ids": [
+        "chg-pathMatch-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/pathMatch.md",
+      "missing_sections": []
+    },
+    "page-search": {
+      "page_id": "page-search",
+      "route": "search",
+      "code_paths": [
+        "../views/dashboard/ai/index.vue"
+      ],
+      "feature_ids": [
+        "feat-search-core"
+      ],
+      "change_ids": [
+        "chg-search-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/search.md",
+      "missing_sections": []
+    },
+    "page-skill--id": {
+      "page_id": "page-skill--id",
+      "route": "skill/:id",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-skill--id-core"
+      ],
+      "change_ids": [
+        "chg-skill--id-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/skill--id.md",
+      "missing_sections": []
+    },
+    "page-system": {
+      "page_id": "page-system",
+      "route": "system",
+      "code_paths": [
+        "../views/newAI/agent.vue"
+      ],
+      "feature_ids": [
+        "feat-system-core"
+      ],
+      "change_ids": [
+        "chg-system-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/system.md",
+      "missing_sections": []
+    },
+    "page-workbench-apps": {
+      "page_id": "page-workbench-apps",
+      "route": "workbench/apps",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-workbench-apps-core"
+      ],
+      "change_ids": [
+        "chg-workbench-apps-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/workbench-apps.md",
+      "missing_sections": []
+    },
+    "page-workbench-keys": {
+      "page_id": "page-workbench-keys",
+      "route": "workbench/keys",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-workbench-keys-core"
+      ],
+      "change_ids": [
+        "chg-workbench-keys-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/workbench-keys.md",
+      "missing_sections": []
+    },
+    "page-workbench-stats": {
+      "page_id": "page-workbench-stats",
+      "route": "workbench/stats",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-workbench-stats-core"
+      ],
+      "change_ids": [
+        "chg-workbench-stats-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/workbench-stats.md",
+      "missing_sections": []
+    },
+    "page-workbench-subscriptions": {
+      "page_id": "page-workbench-subscriptions",
+      "route": "workbench/subscriptions",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-workbench-subscriptions-core"
+      ],
+      "change_ids": [
+        "chg-workbench-subscriptions-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/workbench-subscriptions.md",
+      "missing_sections": []
+    },
+    "page-workbench": {
+      "page_id": "page-workbench",
+      "route": "workbench",
+      "code_paths": [
+        "../views/ai/mcp/skillDetail.vue"
+      ],
+      "feature_ids": [
+        "feat-workbench-core"
+      ],
+      "change_ids": [
+        "chg-workbench-init"
+      ],
+      "last_synced_at": "2026-06-03",
+      "prd_path": "docs/product/pages/workbench.md",
+      "missing_sections": []
+    }
+  },
+  "routes": {
+    "page-index": {
+      "page_id": "page-index",
+      "route": "/",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/index.md"
+    },
+    "page-search": {
+      "page_id": "page-search",
+      "route": "search",
+      "code_path": "../views/dashboard/ai/index.vue",
+      "prd_path": "docs/product/pages/search.md"
+    },
+    "page-ability--id": {
+      "page_id": "page-ability--id",
+      "route": "ability/:id",
+      "code_path": "../views/newAI/knowledge.vue",
+      "prd_path": "docs/product/pages/ability--id.md"
+    },
+    "page-system": {
+      "page_id": "page-system",
+      "route": "system",
+      "code_path": "../views/newAI/agent.vue",
+      "prd_path": "docs/product/pages/system.md"
+    },
+    "page-agents": {
+      "page_id": "page-agents",
+      "route": "agents",
+      "code_path": "../views/newAI/mcp.vue",
+      "prd_path": "docs/product/pages/agents.md"
+    },
+    "page-ai-app": {
+      "page_id": "page-ai-app",
+      "route": "ai-app",
+      "code_path": "../views/newAI/apiKey.vue",
+      "prd_path": "docs/product/pages/ai-app.md"
+    },
+    "page-experience": {
+      "page_id": "page-experience",
+      "route": "experience",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/experience.md"
+    },
+    "page-experience-agent": {
+      "page_id": "page-experience-agent",
+      "route": "experience/agent",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/experience-agent.md"
+    },
+    "page-experience-mcp": {
+      "page_id": "page-experience-mcp",
+      "route": "experience/mcp",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/experience-mcp.md"
+    },
+    "page-mcp": {
+      "page_id": "page-mcp",
+      "route": "mcp",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/mcp.md"
+    },
+    "page-mcp--id": {
+      "page_id": "page-mcp--id",
+      "route": "mcp/:id",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/mcp--id.md"
+    },
+    "page-skill--id": {
+      "page_id": "page-skill--id",
+      "route": "skill/:id",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/skill--id.md"
+    },
+    "page-knowledge": {
+      "page_id": "page-knowledge",
+      "route": "knowledge",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/knowledge.md"
+    },
+    "page-knowledge--id": {
+      "page_id": "page-knowledge--id",
+      "route": "knowledge/:id",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/knowledge--id.md"
+    },
+    "page-developers": {
+      "page_id": "page-developers",
+      "route": "developers",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/developers.md"
+    },
+    "page-workbench": {
+      "page_id": "page-workbench",
+      "route": "workbench",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/workbench.md"
+    },
+    "page-workbench-keys": {
+      "page_id": "page-workbench-keys",
+      "route": "workbench/keys",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/workbench-keys.md"
+    },
+    "page-workbench-apps": {
+      "page_id": "page-workbench-apps",
+      "route": "workbench/apps",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/workbench-apps.md"
+    },
+    "page-workbench-subscriptions": {
+      "page_id": "page-workbench-subscriptions",
+      "route": "workbench/subscriptions",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/workbench-subscriptions.md"
+    },
+    "page-workbench-stats": {
+      "page_id": "page-workbench-stats",
+      "route": "workbench/stats",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/workbench-stats.md"
+    },
+    "page-newAI-assistant": {
+      "page_id": "page-newAI-assistant",
+      "route": "newAI/assistant",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/newAI-assistant.md"
+    },
+    "page-newAI-knowledge": {
+      "page_id": "page-newAI-knowledge",
+      "route": "newAI/knowledge",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/newAI-knowledge.md"
+    },
+    "page-newAI-agent": {
+      "page_id": "page-newAI-agent",
+      "route": "newAI/agent",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/newAI-agent.md"
+    },
+    "page-newAI-mcp": {
+      "page_id": "page-newAI-mcp",
+      "route": "newAI/mcp",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/newAI-mcp.md"
+    },
+    "page-newAI-apiKey": {
+      "page_id": "page-newAI-apiKey",
+      "route": "newAI/apiKey",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/newAI-apiKey.md"
+    },
+    "page-newAI-system": {
+      "page_id": "page-newAI-system",
+      "route": "newAI/system",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/newAI-system.md"
+    },
+    "page-docs": {
+      "page_id": "page-docs",
+      "route": "docs",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/docs.md"
+    },
+    "page-console": {
+      "page_id": "page-console",
+      "route": "console",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/console.md"
+    },
+    "page-pathMatch": {
+      "page_id": "page-pathMatch",
+      "route": "/:pathMatch(.*)*",
+      "code_path": "../views/ai/mcp/skillDetail.vue",
+      "prd_path": "docs/product/pages/pathMatch.md"
+    }
+  },
+  "features": {
+    "feat-index-core": {
+      "feature_id": "feat-index-core",
+      "owner_page_id": "page-index",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-search-core": {
+      "feature_id": "feat-search-core",
+      "owner_page_id": "page-search",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-ability--id-core": {
+      "feature_id": "feat-ability--id-core",
+      "owner_page_id": "page-ability--id",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-system-core": {
+      "feature_id": "feat-system-core",
+      "owner_page_id": "page-system",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-agents-core": {
+      "feature_id": "feat-agents-core",
+      "owner_page_id": "page-agents",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-ai-app-core": {
+      "feature_id": "feat-ai-app-core",
+      "owner_page_id": "page-ai-app",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-experience-core": {
+      "feature_id": "feat-experience-core",
+      "owner_page_id": "page-experience",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-experience-agent-core": {
+      "feature_id": "feat-experience-agent-core",
+      "owner_page_id": "page-experience-agent",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-experience-mcp-core": {
+      "feature_id": "feat-experience-mcp-core",
+      "owner_page_id": "page-experience-mcp",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-mcp-core": {
+      "feature_id": "feat-mcp-core",
+      "owner_page_id": "page-mcp",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-mcp--id-core": {
+      "feature_id": "feat-mcp--id-core",
+      "owner_page_id": "page-mcp--id",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-skill--id-core": {
+      "feature_id": "feat-skill--id-core",
+      "owner_page_id": "page-skill--id",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-knowledge-core": {
+      "feature_id": "feat-knowledge-core",
+      "owner_page_id": "page-knowledge",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-knowledge--id-core": {
+      "feature_id": "feat-knowledge--id-core",
+      "owner_page_id": "page-knowledge--id",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-developers-core": {
+      "feature_id": "feat-developers-core",
+      "owner_page_id": "page-developers",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-workbench-core": {
+      "feature_id": "feat-workbench-core",
+      "owner_page_id": "page-workbench",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-workbench-keys-core": {
+      "feature_id": "feat-workbench-keys-core",
+      "owner_page_id": "page-workbench-keys",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-workbench-apps-core": {
+      "feature_id": "feat-workbench-apps-core",
+      "owner_page_id": "page-workbench-apps",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-workbench-subscriptions-core": {
+      "feature_id": "feat-workbench-subscriptions-core",
+      "owner_page_id": "page-workbench-subscriptions",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-workbench-stats-core": {
+      "feature_id": "feat-workbench-stats-core",
+      "owner_page_id": "page-workbench-stats",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-newAI-assistant-core": {
+      "feature_id": "feat-newAI-assistant-core",
+      "owner_page_id": "page-newAI-assistant",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-newAI-knowledge-core": {
+      "feature_id": "feat-newAI-knowledge-core",
+      "owner_page_id": "page-newAI-knowledge",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-newAI-agent-core": {
+      "feature_id": "feat-newAI-agent-core",
+      "owner_page_id": "page-newAI-agent",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-newAI-mcp-core": {
+      "feature_id": "feat-newAI-mcp-core",
+      "owner_page_id": "page-newAI-mcp",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-newAI-apiKey-core": {
+      "feature_id": "feat-newAI-apiKey-core",
+      "owner_page_id": "page-newAI-apiKey",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-newAI-system-core": {
+      "feature_id": "feat-newAI-system-core",
+      "owner_page_id": "page-newAI-system",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-docs-core": {
+      "feature_id": "feat-docs-core",
+      "owner_page_id": "page-docs",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-console-core": {
+      "feature_id": "feat-console-core",
+      "owner_page_id": "page-console",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    },
+    "feat-pathMatch-core": {
+      "feature_id": "feat-pathMatch-core",
+      "owner_page_id": "page-pathMatch",
+      "status": "todo",
+      "一级菜单": "[TODO]",
+      "二级页面": "文档支持",
+      "三级功能": "[TODO]"
+    }
+  },
+  "changes": {
+    "chg-ability--id-init": {
+      "change_id": "chg-ability--id-init",
+      "affected_page_ids": "page-ability--id",
+      "affected_feature_ids": "feat-ability--id-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/ability--id-change.md"
+    },
+    "chg-agents-init": {
+      "change_id": "chg-agents-init",
+      "affected_page_ids": "page-agents",
+      "affected_feature_ids": "feat-agents-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/agents-change.md"
+    },
+    "chg-ai-app-init": {
+      "change_id": "chg-ai-app-init",
+      "affected_page_ids": "page-ai-app",
+      "affected_feature_ids": "feat-ai-app-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/ai-app-change.md"
+    },
+    "chg-console-init": {
+      "change_id": "chg-console-init",
+      "affected_page_ids": "page-console",
+      "affected_feature_ids": "feat-console-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/console-change.md"
+    },
+    "chg-developers-init": {
+      "change_id": "chg-developers-init",
+      "affected_page_ids": "page-developers",
+      "affected_feature_ids": "feat-developers-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/developers-change.md"
+    },
+    "chg-docs-init": {
+      "change_id": "chg-docs-init",
+      "affected_page_ids": "page-docs",
+      "affected_feature_ids": "feat-docs-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/docs-change.md"
+    },
+    "chg-experience-agent-init": {
+      "change_id": "chg-experience-agent-init",
+      "affected_page_ids": "page-experience-agent",
+      "affected_feature_ids": "feat-experience-agent-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/experience-agent-change.md"
+    },
+    "chg-experience-init": {
+      "change_id": "chg-experience-init",
+      "affected_page_ids": "page-experience",
+      "affected_feature_ids": "feat-experience-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/experience-change.md"
+    },
+    "chg-experience-mcp-init": {
+      "change_id": "chg-experience-mcp-init",
+      "affected_page_ids": "page-experience-mcp",
+      "affected_feature_ids": "feat-experience-mcp-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/experience-mcp-change.md"
+    },
+    "chg-index-init": {
+      "change_id": "chg-index-init",
+      "affected_page_ids": "page-index",
+      "affected_feature_ids": "feat-index-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/index-change.md"
+    },
+    "index-change-20260528-a": {
+      "change_id": "index-change-20260528-a",
+      "affected_page_ids": "page-index",
+      "affected_feature_ids": "feat-index-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/index-change.md"
+    },
+    "index-change-20260528-b": {
+      "change_id": "index-change-20260528-b",
+      "affected_page_ids": "page-index",
+      "affected_feature_ids": "feat-index-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/index-change.md"
+    },
+    "index-change-20260528-c": {
+      "change_id": "index-change-20260528-c",
+      "affected_page_ids": "page-index",
+      "affected_feature_ids": "feat-index-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/index-change.md"
+    },
+    "chg-knowledge--id-init": {
+      "change_id": "chg-knowledge--id-init",
+      "affected_page_ids": "page-knowledge--id",
+      "affected_feature_ids": "feat-knowledge--id-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/knowledge--id-change.md"
+    },
+    "chg-knowledge-init": {
+      "change_id": "chg-knowledge-init",
+      "affected_page_ids": "page-knowledge",
+      "affected_feature_ids": "feat-knowledge-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/knowledge-change.md"
+    },
+    "chg-mcp--id-init": {
+      "change_id": "chg-mcp--id-init",
+      "affected_page_ids": "page-mcp--id",
+      "affected_feature_ids": "feat-mcp--id-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/mcp--id-change.md"
+    },
+    "chg-mcp-init": {
+      "change_id": "chg-mcp-init",
+      "affected_page_ids": "page-mcp",
+      "affected_feature_ids": "feat-mcp-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/mcp-change.md"
+    },
+    "chg-newAI-agent-init": {
+      "change_id": "chg-newAI-agent-init",
+      "affected_page_ids": "page-newAI-agent",
+      "affected_feature_ids": "feat-newAI-agent-core",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-agent-change.md"
+    },
+    "newAI-agent-change": {
+      "change_id": "newAI-agent-change",
+      "affected_page_ids": "page-newAI-agent",
+      "affected_feature_ids": "feat-agent-list",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-agent-change.md"
+    },
+    "chg-newAI-apiKey-init": {
+      "change_id": "chg-newAI-apiKey-init",
+      "affected_page_ids": "page-newAI-apiKey",
+      "affected_feature_ids": "feat-newAI-apiKey-core",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-apiKey-change.md"
+    },
+    "newAI-apiKey-change": {
+      "change_id": "newAI-apiKey-change",
+      "affected_page_ids": "page-newAI-apiKey",
+      "affected_feature_ids": "feat-api-key",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-apiKey-change.md"
+    },
+    "newAI-assistant-change-20260526-a": {
+      "change_id": "newAI-assistant-change-20260526-a",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-newAI-assistant-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260525-a": {
+      "change_id": "newAI-assistant-change-20260525-a",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-assistant-clarification",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "chg-newAI-assistant-init": {
+      "change_id": "chg-newAI-assistant-init",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-newAI-assistant-core",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change": {
+      "change_id": "newAI-assistant-change",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-assistant-agent,feat-assistant-feedback,feat-assistant-context,feat-assistant-ocr,feat-assistant-model",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260525": {
+      "change_id": "newAI-assistant-change-20260525",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-assistant-feedback,feat-assistant-context,feat-assistant-rewrite",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260525-b": {
+      "change_id": "newAI-assistant-change-20260525-b",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-assistant-feedback",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260526-b": {
+      "change_id": "newAI-assistant-change-20260526-b",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-auth-register",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260525-c": {
+      "change_id": "newAI-assistant-change-20260525-c",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-assistant-feedback,feat-assistant-rewrite",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260526-c": {
+      "change_id": "newAI-assistant-change-20260526-c",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-auth-register",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260526-d": {
+      "change_id": "newAI-assistant-change-20260526-d",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-assistant-rewrite,feat-assistant-session-actions",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260526-e": {
+      "change_id": "newAI-assistant-change-20260526-e",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-newAI-assistant-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260526-f": {
+      "change_id": "newAI-assistant-change-20260526-f",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-newAI-assistant-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260527-a": {
+      "change_id": "newAI-assistant-change-20260527-a",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-auth-register",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260527-b": {
+      "change_id": "newAI-assistant-change-20260527-b",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-auth-register",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "newAI-assistant-change-20260527-c": {
+      "change_id": "newAI-assistant-change-20260527-c",
+      "affected_page_ids": "page-newAI-assistant",
+      "affected_feature_ids": "feat-auth-register",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-assistant-change.md"
+    },
+    "chg-newAI-knowledge-init": {
+      "change_id": "chg-newAI-knowledge-init",
+      "affected_page_ids": "page-newAI-knowledge",
+      "affected_feature_ids": "feat-newAI-knowledge-core",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-knowledge-change.md"
+    },
+    "newAI-knowledge-change": {
+      "change_id": "newAI-knowledge-change",
+      "affected_page_ids": "page-newAI-knowledge",
+      "affected_feature_ids": "feat-knowledge-list",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-knowledge-change.md"
+    },
+    "chg-newAI-mcp-init": {
+      "change_id": "chg-newAI-mcp-init",
+      "affected_page_ids": "page-newAI-mcp",
+      "affected_feature_ids": "feat-newAI-mcp-core",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-mcp-change.md"
+    },
+    "newAI-mcp-change": {
+      "change_id": "newAI-mcp-change",
+      "affected_page_ids": "page-newAI-mcp",
+      "affected_feature_ids": "feat-mcp-test",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-mcp-change.md"
+    },
+    "chg-newAI-system-init": {
+      "change_id": "chg-newAI-system-init",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-newAI-system-core",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change": {
+      "change_id": "newAI-system-change",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account,feat-cocreation-list,feat-audit-log,feat-usage-analysis,feat-backup-snapshot",
+      "source_commit": "699e024",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525": {
+      "change_id": "newAI-system-change-20260525",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account,feat-cocreation-list,feat-audit-log,feat-usage-analysis,feat-backup-snapshot",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-b": {
+      "change_id": "newAI-system-change-20260525-b",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-c": {
+      "change_id": "newAI-system-change-20260525-c",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-newAI-system-core,feat-assistant-model",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-d": {
+      "change_id": "newAI-system-change-20260525-d",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-e": {
+      "change_id": "newAI-system-change-20260525-e",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-f": {
+      "change_id": "newAI-system-change-20260525-f",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-g": {
+      "change_id": "newAI-system-change-20260525-g",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template,feat-license-instance,feat-license-account",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-h": {
+      "change_id": "newAI-system-change-20260525-h",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-newAI-system-core",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-i": {
+      "change_id": "newAI-system-change-20260525-i",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-cocreation-list",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-j": {
+      "change_id": "newAI-system-change-20260525-j",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-usage-analysis",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-k": {
+      "change_id": "newAI-system-change-20260525-k",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-instance,feat-license-account",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-l": {
+      "change_id": "newAI-system-change-20260525-l",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260525-m": {
+      "change_id": "newAI-system-change-20260525-m",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-instance,feat-audit-log",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260526-a": {
+      "change_id": "newAI-system-change-20260526-a",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260526-b": {
+      "change_id": "newAI-system-change-20260526-b",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-license-template",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260603-a": {
+      "change_id": "newAI-system-change-20260603-a",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-cocreation-list",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260603-b": {
+      "change_id": "newAI-system-change-20260603-b",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-newAI-system-core,feat-assistant-model",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260603-c": {
+      "change_id": "newAI-system-change-20260603-c",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-cocreation-list",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260603-d": {
+      "change_id": "newAI-system-change-20260603-d",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-quota-governance,feat-account-quota",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "newAI-system-change-20260603-e": {
+      "change_id": "newAI-system-change-20260603-e",
+      "affected_page_ids": "page-newAI-system",
+      "affected_feature_ids": "feat-quota-governance,feat-account-quota",
+      "source_commit": "local",
+      "file": "docs/product/changelog/newAI-system-change.md"
+    },
+    "chg-pathMatch-init": {
+      "change_id": "chg-pathMatch-init",
+      "affected_page_ids": "page-pathMatch",
+      "affected_feature_ids": "feat-pathMatch-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/pathMatch-change.md"
+    },
+    "chg-search-init": {
+      "change_id": "chg-search-init",
+      "affected_page_ids": "page-search",
+      "affected_feature_ids": "feat-search-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/search-change.md"
+    },
+    "chg-skill--id-init": {
+      "change_id": "chg-skill--id-init",
+      "affected_page_ids": "page-skill--id",
+      "affected_feature_ids": "feat-skill--id-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/skill--id-change.md"
+    },
+    "chg-system-init": {
+      "change_id": "chg-system-init",
+      "affected_page_ids": "page-system",
+      "affected_feature_ids": "feat-system-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/system-change.md"
+    },
+    "chg-workbench-apps-init": {
+      "change_id": "chg-workbench-apps-init",
+      "affected_page_ids": "page-workbench-apps",
+      "affected_feature_ids": "feat-workbench-apps-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/workbench-apps-change.md"
+    },
+    "chg-workbench-init": {
+      "change_id": "chg-workbench-init",
+      "affected_page_ids": "page-workbench",
+      "affected_feature_ids": "feat-workbench-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/workbench-change.md"
+    },
+    "chg-workbench-keys-init": {
+      "change_id": "chg-workbench-keys-init",
+      "affected_page_ids": "page-workbench-keys",
+      "affected_feature_ids": "feat-workbench-keys-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/workbench-keys-change.md"
+    },
+    "chg-workbench-stats-init": {
+      "change_id": "chg-workbench-stats-init",
+      "affected_page_ids": "page-workbench-stats",
+      "affected_feature_ids": "feat-workbench-stats-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/workbench-stats-change.md"
+    },
+    "chg-workbench-subscriptions-init": {
+      "change_id": "chg-workbench-subscriptions-init",
+      "affected_page_ids": "page-workbench-subscriptions",
+      "affected_feature_ids": "feat-workbench-subscriptions-core",
+      "source_commit": "[TODO: commit]",
+      "file": "docs/product/changelog/workbench-subscriptions-change.md"
+    }
+  }
+}

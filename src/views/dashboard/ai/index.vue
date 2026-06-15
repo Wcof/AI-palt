@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { X, Sparkles } from 'lucide-vue-next'
-import ConversationSidebar from '@/components/aiApp/ConversationSidebar.vue'
+import { X } from 'lucide-vue-next'
 import ChatInterface from '@/components/aiApp/ChatInterface.vue'
 import ReportPreviewPanel from '@/components/aiApp/ReportPreviewPanel.vue'
 import DocumentWritingPanel from '@/components/aiApp/DocumentWritingPanel.vue'
 import MeetingMinutesPanel from '@/components/aiApp/MeetingMinutesPanel.vue'
+import PlatformSideNav from '@/components/layout/PlatformSideNav.vue'
 import { AI_AGENT_OPTIONS, type AgentType, useAIAppStore } from '@/stores/aiApp'
+import { useNewAIStore } from '@/stores/newAI'
 
 defineOptions({ name: 'DashboardAI' })
 
 const aiStore = useAIAppStore()
+const newAIStore = useNewAIStore()
 const sidebarOpen = ref(false)
-const sidebarCollapsed = ref(false)
 
 const activeConversation = computed(() => aiStore.conversations.find(c => c.id === aiStore.activeConversationId) ?? null)
 const splitAgentTypes = ['report', 'document', 'meeting'] as const
@@ -25,23 +26,43 @@ const hasPanelContent = computed(() => {
 })
 
 const showReportPreview = computed(() => reportPanelRequested.value && hasPanelContent.value)
-const effectiveSidebarCollapsed = computed(() => sidebarCollapsed.value)
-
-function handleCreate() {
-  aiStore.createConversation('general', false)
-  sidebarOpen.value = false
-}
 
 function handleSend(content: string) {
+  const quotaResult = newAIStore.consumeQuota({
+    userName: newAIStore.currentAccount?.name || '用户名称',
+    requests: 1,
+    tokens: Math.max(content.length * 12, 320),
+  })
+  if (!quotaResult.allowed) {
+    aiStore.error = quotaResult.reason
+    return
+  }
+  aiStore.error = quotaResult.reason || null
   let convId = activeConversation.value?.id
   if (!convId) convId = aiStore.createConversation(aiStore.selectedAgentType)
   aiStore.sendMessage(convId, content)
 }
 
 function handleSendImage(image: string) {
+  if (!newAIStore.requireFeature('ocr', 'OCR / 隐患识图')) return
+  const quotaResult = newAIStore.consumeQuota({
+    userName: newAIStore.currentAccount?.name || '用户名称',
+    requests: 1,
+    tokens: 880,
+    storageGb: 1,
+  })
+  if (!quotaResult.allowed) {
+    aiStore.error = quotaResult.reason
+    return
+  }
+  aiStore.error = quotaResult.reason || null
   let convId = activeConversation.value?.id
   if (!convId) convId = aiStore.createConversation('hazard')
+  const upload = newAIStore.createUpload('现场图片.png', 'image/png')
+  newAIStore.finalizeUpload(upload.id, true)
+  const ocrTask = newAIStore.createOcrTask(upload.name)
   aiStore.sendImageAnalysis(convId, image)
+  newAIStore.logAudit('OCR 任务', 'create', '-', `${upload.name}/${ocrTask.id}`)
 }
 
 function handlePrompt(content: string) {
@@ -49,15 +70,8 @@ function handlePrompt(content: string) {
 }
 
 function handleChangeAgent(agentType: AgentType) {
+  if (agentType === 'hazard' && !newAIStore.requireFeature('ocr', 'OCR / 隐患识图')) return
   aiStore.setActiveAgent(agentType)
-}
-
-function handleSelectAgentApp(payload: { agentType: AgentType; name: string }) {
-  aiStore.setActiveAgent(payload.agentType)
-  if (!aiStore.activeConversationId) {
-    aiStore.createConversation(payload.agentType, true)
-  }
-  sidebarOpen.value = false
 }
 </script>
 
@@ -67,19 +81,7 @@ function handleSelectAgentApp(payload: { agentType: AgentType; name: string }) {
     <div class="pointer-events-none absolute right-10 top-8 h-40 w-40 rounded-[2.25rem] border border-white/50 bg-white/40 blur-[0.0625rem] rotate-12" />
     <div class="pointer-events-none absolute left-[34%] top-10 h-24 w-80 rounded-full bg-white/30 blur-3xl" />
     <div class="relative flex h-full overflow-hidden">
-      <div class="hidden md:block" :class="effectiveSidebarCollapsed ? 'w-[4.5rem]' : 'w-[clamp(16.25rem,22vw,20rem)]'">
-        <ConversationSidebar
-          :conversations="aiStore.sortedConversations"
-          :active-id="aiStore.activeConversationId"
-          :streaming-id="aiStore.streamingConversationId"
-          :collapsed="effectiveSidebarCollapsed"
-          @create="handleCreate"
-          @select="aiStore.switchConversation"
-          @delete="aiStore.deleteConversation"
-          @toggle-collapse="sidebarCollapsed = !sidebarCollapsed"
-          @select-agent-app="handleSelectAgentApp"
-        />
-      </div>
+      <PlatformSideNav />
 
       <div class="min-w-0 flex flex-1 overflow-hidden">
         <div :class="showReportPreview ? 'min-w-0 flex-1 bg-blue-50/40 backdrop-blur-sm lg:flex-[0_0_50%]' : 'min-w-0 flex-1 bg-blue-50/40 backdrop-blur-sm'">
@@ -147,7 +149,7 @@ function handleSelectAgentApp(payload: { agentType: AgentType; name: string }) {
             leave-to-class="-translate-x-full"
           >
             <div v-if="sidebarOpen" class="absolute left-0 top-0 flex h-full w-[86vw] max-w-[21.25rem] flex-col bg-white/90 shadow-2xl backdrop-blur-xl">
-              <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3">
+              <div class="flex items-center justify-between border-b border-slate-200 px-4 py-3 lg:hidden">
                 <div>
                   <div class="text-sm font-semibold text-slate-950">极客光年安全大模型</div>
                   <div class="text-[0.6875rem] text-slate-500">安全生产智能应用工作台</div>
@@ -157,20 +159,7 @@ function handleSelectAgentApp(payload: { agentType: AgentType; name: string }) {
                 </button>
               </div>
               <div class="min-h-0 flex-1 overflow-auto">
-                <ConversationSidebar
-                  :conversations="aiStore.sortedConversations"
-                  :active-id="aiStore.activeConversationId"
-                  :streaming-id="aiStore.streamingConversationId"
-                  :collapsed="false"
-                  :hide-header="true"
-                  @create="handleCreate"
-                  @select="(id) => { aiStore.switchConversation(id); sidebarOpen = false }"
-                  @delete="aiStore.deleteConversation"
-                  @select-agent-app="handleSelectAgentApp"
-                />
-              </div>
-              <div class="border-t border-slate-200 p-4 text-[0.6875rem] leading-5 text-slate-500">
-                <span class="inline-flex items-center gap-1.5"><Sparkles class="h-3.5 w-3.5" /> 主导航已收敛到左侧栏。</span>
+                <PlatformSideNav :always-visible="true" />
               </div>
             </div>
           </transition>

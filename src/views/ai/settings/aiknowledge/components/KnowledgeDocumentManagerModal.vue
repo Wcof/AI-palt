@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { Search, UploadCloud, FileText, MoreHorizontal, CheckCircle2, Circle, X, Database, TestTube2, Eye, Pencil, Trash2 } from 'lucide-vue-next'
+import { useNewAIStore } from '@/stores/newAI'
 
 export type KnowledgeBaseLite = {
   id: string
@@ -30,12 +31,23 @@ const keyword = ref('')
 const hitQuestion = ref('请检索特种设备安全相关文档命中情况')
 const documents = ref<Record<string, KnowledgeDoc[]>>({})
 const openMenuId = ref<string | null>(null)
+const store = useNewAIStore()
+const metadataDraft = ref<Record<string, string>>({})
+
+function buildDefaultMetadata() {
+  const values: Record<string, string> = {}
+  store.metadataTags.forEach((tag) => {
+    values[tag.code] = tag.valueType === 'enum' ? (tag.options[0] || '') : ''
+  })
+  return values
+}
 
 watch(() => props.visible, (visible) => {
   if (visible) {
     activeTab.value = 'docs'
     keyword.value = ''
     openMenuId.value = null
+    metadataDraft.value = buildDefaultMetadata()
   }
 })
 
@@ -74,19 +86,33 @@ function nowText() {
 function addManualDoc() {
   const id = props.knowledgeBase?.id
   if (!id) return
+  const title = '新建文档（手动录入）'
   documents.value[id] = [
-    { id: `${id}-manual-${Date.now()}`, title: '新建文档（手动录入）', source: 'manual', status: 'processing', updatedAt: nowText() },
+    { id: `${id}-manual-${Date.now()}`, title, source: 'manual', status: 'processing', updatedAt: nowText() },
     ...(documents.value[id] || []),
   ]
+  store.upsertKnowledgeDocumentMetadata({
+    knowledgeBaseId: id,
+    documentName: title,
+    sourceType: 'manual',
+    values: { ...metadataDraft.value },
+  })
 }
 
 function addUploadDoc() {
   const id = props.knowledgeBase?.id
   if (!id) return
+  const title = '新上传文档.pdf'
   documents.value[id] = [
-    { id: `${id}-upload-${Date.now()}`, title: '新上传文档.pdf', source: 'upload', status: 'processing', updatedAt: nowText() },
+    { id: `${id}-upload-${Date.now()}`, title, source: 'upload', status: 'processing', updatedAt: nowText() },
     ...(documents.value[id] || []),
   ]
+  store.upsertKnowledgeDocumentMetadata({
+    knowledgeBaseId: id,
+    documentName: title,
+    sourceType: 'upload',
+    values: { ...metadataDraft.value },
+  })
 }
 
 function toggleDocMenu(id: string) {
@@ -102,6 +128,16 @@ function removeDoc(id: string) {
   if (!kbId) return
   documents.value[kbId] = (documents.value[kbId] || []).filter(item => item.id !== id)
   closeDocMenu()
+}
+
+function metadataText(item: KnowledgeDoc) {
+  const kbId = props.knowledgeBase?.id
+  if (!kbId) return '暂无元数据'
+  const metadata = store.getKnowledgeDocumentMetadata(kbId, item.title)
+  if (!metadata) return '暂无元数据'
+  const entries = Object.entries(metadata.values).filter(([, value]) => value)
+  if (!entries.length) return '暂无元数据'
+  return entries.map(([key, value]) => `${key}: ${value}`).join(' · ')
 }
 </script>
 
@@ -144,6 +180,7 @@ function removeDoc(id: string) {
               <div class="kb-doc-grid">
                 <article class="kb-create-card">
                   <div class="kb-card-title">创建文档</div>
+                  <div class="kb-create-copy">先选择文档创建方式，再按右侧元数据规范完成标签标注，保证后续检索与治理口径一致。</div>
                   <div class="kb-create-actions">
                     <button type="button" class="kb-action-card" @click="addManualDoc">
                       <FileText class="h-4 w-4" />
@@ -153,6 +190,20 @@ function removeDoc(id: string) {
                       <UploadCloud class="h-4 w-4" />
                       <span>文件上传</span>
                     </button>
+                  </div>
+                </article>
+
+                <article class="kb-meta-card">
+                  <div class="kb-card-title">上传元数据标注</div>
+                  <div class="kb-meta-tip">当前标签会在新建文档时一并写入，支持知识筛选、命中解释和后台治理。</div>
+                  <div class="kb-meta-form compact">
+                    <label v-for="tag in store.metadataTags" :key="tag.id" class="kb-meta-field">
+                      <span>{{ tag.name }}<em v-if="tag.required">*</em></span>
+                      <select v-if="tag.valueType === 'enum'" v-model="metadataDraft[tag.code]">
+                        <option v-for="option in tag.options" :key="option" :value="option">{{ option }}</option>
+                      </select>
+                      <input v-else v-model="metadataDraft[tag.code]" type="text" :placeholder="`请输入${tag.name}`" />
+                    </label>
                   </div>
                 </article>
 
@@ -171,6 +222,7 @@ function removeDoc(id: string) {
                         <span class="kb-dot">·</span>
                         <span class="kb-doc-inline-ellipsis">{{ item.updatedAt }}</span>
                       </div>
+                      <div class="kb-doc-meta-preview" :title="metadataText(item)">{{ metadataText(item) }}</div>
                     </div>
                     <div class="kb-doc-card-actions">
                       <button type="button" class="kb-doc-primary-btn">查看</button>
@@ -242,15 +294,25 @@ function removeDoc(id: string) {
 .kb-search-icon { position: absolute; left: 14px; top: 50%; width: 16px; height: 16px; transform: translateY(-50%); color: #94a3b8; }
 .kb-search-box input { width: 100%; border-radius: 14px; border: 1px solid #bfdbfe; background: #fff; padding: 11px 14px 11px 40px; font-size: 13px; outline: none; }
 .kb-doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; align-items: start; }
-.kb-create-card, .kb-doc-card { border-radius: 22px; border: 1px solid #dbeafe; background: #fff; padding: 18px 20px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.04); min-width: 0; }
+.kb-create-card, .kb-meta-card, .kb-doc-card { border-radius: 22px; border: 1px solid #dbeafe; background: #fff; padding: 18px 20px; box-shadow: 0 12px 32px rgba(15, 23, 42, 0.04); min-width: 0; }
 .kb-create-card { border-style: dashed; background: #fcfdff; }
 .kb-card-title { font-size: 16px; font-weight: 800; color: #0f172a; }
+.kb-create-copy { margin-top: 10px; font-size: 12px; line-height: 1.7; color: #64748b; }
+.kb-meta-card { background: linear-gradient(180deg, #fcfdff, #f8fbff); }
+.kb-meta-tip { margin-top: 10px; font-size: 12px; line-height: 1.7; color: #64748b; }
+.kb-meta-form { margin-top: 16px; display: grid; gap: 10px; }
+.kb-meta-form.compact { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: start; }
+.kb-meta-field { display: grid; gap: 6px; }
+.kb-meta-field span { font-size: 12px; font-weight: 700; color: #475569; }
+.kb-meta-field em { margin-left: 2px; font-style: normal; color: #dc2626; }
+.kb-meta-field input, .kb-meta-field select { width: 100%; border-radius: 12px; border: 1px solid #dbeafe; background: #fff; padding: 9px 12px; font-size: 12px; outline: none; }
 .kb-create-actions { margin-top: 18px; display: grid; gap: 12px; }
 .kb-action-card { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: 1px solid #dbeafe; background: #f8fafc; padding: 10px 14px; color: #475569; font-size: 13px; font-weight: 700; }
 .kb-doc-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
 .kb-doc-card-main { min-width: 0; flex: 1; }
 .kb-doc-card-title { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 15px; font-weight: 800; color: #0f172a; }
 .kb-doc-card-subline { margin-top: 10px; display: flex; align-items: center; gap: 8px; min-width: 0; white-space: nowrap; overflow: hidden; font-size: 12px; color: #64748b; }
+.kb-doc-meta-preview { margin-top: 10px; font-size: 12px; line-height: 1.6; color: #475569; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 .kb-dot { flex-shrink: 0; color: #cbd5e1; }
 .kb-doc-card-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .kb-doc-primary-btn { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 12px; border-radius: 999px; border: 1px solid #bfdbfe; background: #eff6ff; color: #2563eb; font-size: 12px; font-weight: 700; }
